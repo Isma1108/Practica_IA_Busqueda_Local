@@ -123,7 +123,7 @@ public class BicingDemo {
     //para que nos genere un escenario con las n estaciones en posiciones aleatorias del mapa
 
     Estaciones est = new Estaciones(nest, nbic, dem, seed);
-    BicingBoard board = new BicingBoard(est, estado_ini);
+    BicingBoard board = new BicingBoard(est, nfurg, estado_ini);
 
     //Heuristica 0 -> maximicación de lo que obtenemos por los traslados de las bicis
     //Heuristica 1 -> Heuristica 0 + minimización del coste del transporte de las bicis
