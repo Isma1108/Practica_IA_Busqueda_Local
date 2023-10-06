@@ -1,5 +1,3 @@
-package IA.Bicing;
-
 import aima.search.framework.GoalTest;
 
 public class BicingGoalTest implements GoalTest {
