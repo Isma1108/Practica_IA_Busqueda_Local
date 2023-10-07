@@ -1,4 +1,6 @@
 //todos los imports que necesitemos
+import IA.Bicing.Estaciones;
+
 import java.util.*;
 
 public class BicingBoard {

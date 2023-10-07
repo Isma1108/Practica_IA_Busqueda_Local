@@ -1,3 +1,5 @@
+import IA.Bicing.Estaciones;
+
 import aima.search.framework.Problem;
 import aima.search.framework.Search;
 import aima.search.framework.SearchAgent;
