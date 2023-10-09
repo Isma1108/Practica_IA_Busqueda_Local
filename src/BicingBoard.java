@@ -104,20 +104,20 @@ public class BicingBoard {
   }
 
   //Operadores:
-
+  //Python suca blyad
 
 
   //Calidad de la solución + heurísticas
 
   public double getBeneficio() {
-  
+    return 0.0; 
   }
 
   public double getPrecio1() {
-
+    return 0.0; 
   }
   public double getPrecio2() {
-
+    return 0.0; 
   }
   
 
