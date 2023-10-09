@@ -68,27 +68,25 @@ public class BicingBoard {
   }
 
   private void destinoFullRandom(int[] furgoneta, Random random) {
+    if (estaciones.size() <= 1) return; // Caso base: 1 o menos estaciones, la mejor opcion es no hacer nada
     // -1: no va a ninguna estacion
     furgoneta[DESTINO1] = -random.nextInt(0, 2);
     if (furgoneta[DESTINO1] != -1) {
       do furgoneta[DESTINO1] = random.nextInt(0, estaciones.size());
-      while (furgoneta[DESTINO1] == furgoneta[ORIGEN]);
+      while (furgoneta[DESTINO1] == furgoneta[ORIGEN] && estaciones.size() > 1);
 
       int bicisNoUsadas = estaciones.get(furgoneta[ORIGEN]).getNumBicicletasNoUsadas();
 
       furgoneta[BICIS1] = random.nextInt(0, Math.min(30, bicisNoUsadas) + 1);
-      estaciones.get(furgoneta[ORIGEN]).setNumBicicletasNoUsadas(bicisNoUsadas - furgoneta[2]);
       bicisSigHora[furgoneta[DESTINO1]] += furgoneta[BICIS1];
+      bicisNoUsadas = bicisNoUsadas - furgoneta[BICIS1];
 
       furgoneta[DESTINO2] = -random.nextInt(0, -1);
-      if (furgoneta[DESTINO2] != -1) {
+      if (furgoneta[DESTINO2] != -1 && estaciones.size() > 1) {
         do furgoneta[DESTINO2] = random.nextInt(0, estaciones.size());
         while (furgoneta[DESTINO2] == furgoneta[ORIGEN] && furgoneta[DESTINO2] == furgoneta[DESTINO1]);
 
-        bicisNoUsadas = estaciones.get(furgoneta[ORIGEN]).getNumBicicletasNoUsadas();
-
         furgoneta[BICIS2] = random.nextInt(0, Math.min(30, bicisNoUsadas) + 1);
-        estaciones.get(furgoneta[ORIGEN]).setNumBicicletasNoUsadas(bicisNoUsadas - furgoneta[BICIS2]);
         bicisSigHora[furgoneta[DESTINO2]] += furgoneta[BICIS2];
       }
     }
