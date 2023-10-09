@@ -3,9 +3,11 @@ import IA.Bicing.*;
 
 import java.util.*;
 
+
 public class BicingBoard {
 
   //atributos privados:
+<<<<<<< HEAD
   
   private static int num_furgonetas;
 
@@ -13,6 +15,11 @@ public class BicingBoard {
 
   private static Estaciones est;
 
+=======
+  private static Estaciones estaciones = null;
+  private int[] origenFurgonetas = {};
+  private Pair[][] destinoFurgonetas = {};
+>>>>>>> origin
 
   //constructores
   
@@ -55,6 +62,7 @@ public class BicingBoard {
 
   public double getBeneficio() {
 
+<<<<<<< HEAD
   }
   public double getPrecio1() {
 
@@ -68,3 +76,24 @@ public class BicingBoard {
     else return numero2;
   }
 }
+=======
+};
+
+class Pair {
+  public int first;
+  public int second;
+
+  public Pair(int f, int s) {
+    this.first = f;
+    this.second = second;
+  }
+
+  public boolean equalsTo(Pair p) {
+    return this.first == p.first && this.second == p.second;
+  }
+
+  public Pair values() {
+    return new Pair(this.first, this.second);
+  }
+};
+>>>>>>> origin
