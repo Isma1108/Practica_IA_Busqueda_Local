@@ -103,27 +103,16 @@ public class BicingBoard {
 
   }
 
-  //Operador de prueba:
-  //Cambiar destino y descargar todas las bicis
+  //Operadores:
 
-  public void cambiar_destino(int ifurg, int iest) {
-  }
 
-  //Comprovacion de poder usar el operador:
-  public boolean puede_ir(int ifurg, int iest) {
-  }
 
-  public int getNumFurgos() {
-  }
-
-  public int[][] getFurgonetas() {
-  }
-
-  public int getNumEstaciones() {
-  }
+  //Calidad de la solución + heurísticas
 
   public double getBeneficio() {
+  
   }
+
   public double getPrecio1() {
 
   }
@@ -131,6 +120,8 @@ public class BicingBoard {
 
   }
   
+
+  //Maximo de 2 numeros
   public static int max(int numero1, int numero2) {
     if (numero1 > numero2) return numero1;
     else return numero2;
