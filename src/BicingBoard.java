@@ -6,6 +6,13 @@ import java.util.Random;
 
 public class BicingBoard {
 
+  private static int ORIGEN = 0;
+  private static int DESTINO1 = 1;
+  private static int BICIS1 = 2;
+  private static int DESTINO2 = 3;
+  private static int BICIS2 = 4;
+
+
   private static Estaciones estaciones;
   private int[][] furgonetas;
 
@@ -40,20 +47,20 @@ public class BicingBoard {
   //Ninguna furgoneta se usa
   public void generar_solucion_trivial() {
     for (int i = 0; i < furgonetas.length; i++)
-      furgonetas[i][0] = i;
+      furgonetas[i][ORIGEN] = i;
     for (int i = 0; i < bicisSigHora.length; i++)
       bicisSigHora[i] = estaciones.get(i).getNumBicicletasNoUsadas() + estaciones.get(i).getNumBicicletasNext();
   }
   
   public void generar_solucion_random() {
     for (int i = 0; i < furgonetas.length; i++)
-      furgonetas[i][0] = i;
+      furgonetas[i][ORIGEN] = i;
     Random random = new Random();
     for (int i = 0; i < furgonetas.length; i++) { // Barajamos los origenes de las furgonetas
       int randomIndexToSwap = random.nextInt(furgonetas.length);
-      int temp = furgonetas[randomIndexToSwap][0];
-      furgonetas[randomIndexToSwap][0] = furgonetas[i][0];
-      furgonetas[i][0] = temp;
+      int temp = furgonetas[randomIndexToSwap][ORIGEN];
+      furgonetas[randomIndexToSwap][ORIGEN] = furgonetas[i][ORIGEN];
+      furgonetas[i][ORIGEN] = temp;
     }
     for (int i = 0; i < furgonetas.length; i++) {
       destinoFullRandom(furgonetas[i], random);
@@ -61,32 +68,34 @@ public class BicingBoard {
   }
 
   private void destinoFullRandom(int[] furgoneta, Random random) {
-    furgoneta[1] = random.nextInt(-1, 1);
-    if (furgoneta[1] != -1) {
-      do furgoneta[1] = random.nextInt(0, estaciones.size());
-      while (furgoneta[1] != furgonetas[i][0]);
+    // -1: no va a ninguna estacion
+    furgoneta[DESTINO1] = -random.nextInt(0, 2);
+    if (furgoneta[DESTINO1] != -1) {
+      do furgoneta[DESTINO1] = random.nextInt(0, estaciones.size());
+      while (furgoneta[DESTINO1] == furgoneta[ORIGEN]);
 
-      int bicisNoUsadas = estaciones.get(furgoneta[1]).getNumBicicletasNoUsadas();
+      int bicisNoUsadas = estaciones.get(furgoneta[ORIGEN]).getNumBicicletasNoUsadas();
 
-      furgoneta[2] = random.nextInt(1, Math.min(30, bicisNoUsadas));
-      estaciones.get(furgoneta[1]).setNumBicicletasNoUsadas(bicisNoUsadas - furgoneta[2]);
-      bicisSigHora[furgoneta[1]] += furgoneta[2];
-      furgoneta[3] = random.nextInt(-1, 1);
+      furgoneta[BICIS1] = random.nextInt(0, Math.min(30, bicisNoUsadas) + 1);
+      estaciones.get(furgoneta[ORIGEN]).setNumBicicletasNoUsadas(bicisNoUsadas - furgoneta[2]);
+      bicisSigHora[furgoneta[DESTINO1]] += furgoneta[BICIS1];
 
-      if (furgoneta[3] != -1) {
-        do furgoneta[3] = random.nextInt(0, estaciones.size());
-        while (furgoneta[3] != furgoneta[0] && furgoneta[3] != furgoneta[1]);
+      furgoneta[DESTINO2] = -random.nextInt(0, -1);
+      if (furgoneta[DESTINO2] != -1) {
+        do furgoneta[DESTINO2] = random.nextInt(0, estaciones.size());
+        while (furgoneta[DESTINO2] == furgoneta[ORIGEN] && furgoneta[DESTINO2] == furgoneta[DESTINO1]);
 
-        bicisNoUsadas = estaciones.get(furgoneta[1]).getNumBicicletasNoUsadas();
+        bicisNoUsadas = estaciones.get(furgoneta[ORIGEN]).getNumBicicletasNoUsadas();
 
-        furgoneta[4] = random.nextInt(1, Math.min(30, bicisNoUsadas));
-        estaciones.get(furgoneta[3]).setNumBicicletasNoUsadas(bicisNoUsadas - furgoneta[4]);
-        bicisSigHora[furgoneta[3]] += furgoneta[4];
-        furgoneta[3] = random.nextInt(-1, 1);
-
+        furgoneta[BICIS2] = random.nextInt(0, Math.min(30, bicisNoUsadas) + 1);
+        estaciones.get(furgoneta[ORIGEN]).setNumBicicletasNoUsadas(bicisNoUsadas - furgoneta[BICIS2]);
+        bicisSigHora[furgoneta[DESTINO2]] += furgoneta[BICIS2];
       }
-
     }
+  }
+
+  private void destinoGreedyRandom(int[] furgoneta, Random random) {
+    
   }
   
   public void generar_solucion_voraz() {
