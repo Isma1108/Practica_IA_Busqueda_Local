@@ -103,7 +103,7 @@ public class BicingBoard {
   // genera una solución voraz: Furgoneta en estación con menos demanda se dirige a la que tiene más demanda
   // La segunda con menos demanda a la segunda con más, y así
   
-  public void generar_solucion_voraz() {
+  public void generar_solucion_voraz1() {
     //Arrays.sort(SrtDemands, new DemandCompare());
     Collections.sort(estaciones, new Comparator<Estacion>() {
       public int compare (Estacion a, Estacion b) {
@@ -113,6 +113,31 @@ public class BicingBoard {
 
     for (int i = 0; i < estaciones.size(); ++i) {
       System.out.println(estaciones.get(i).getDemanda());
+    }
+
+    for (int i = 0; i < furgonetas.length; ++i) {
+      furgonetas[i][ORIGEN] = i;
+      furgonetas[i][DESTINO1] = furgonetas.length - 1 - i;
+      furgonetas[i][BICIS1] = estaciones.get(furgonetas[i][ORIGEN]).getNumBicicletasNoUsadas();
+      bicisSigHora[furgonetas[i][DESTINO1]] = furgonetas[i][BICIS1] + estaciones.get(furgonetas[i][DESTINO1]).getNumBicicletasNext();
+    }
+
+  }
+
+   public void generar_solucion_voraz2() {
+    //Arrays.sort(SrtDemands, new DemandCompare());
+    Collections.sort(estaciones, new Comparator<Estacion>() {
+      public int compare (Estacion a, Estacion b) {
+
+        int aDif = a.getDemanda() - a.getNumBicicletasNext();
+        int bDif = b.getDemanda() - b.getNumBicicletasNext();
+
+        return aDif - bDif;
+      }
+    });
+
+    for (int i = 0; i < estaciones.size(); ++i) {
+      System.out.println(estaciones.get(i).getDemanda() - estaciones.get(i).getNumBicicletasNext());
     }
 
     for (int i = 0; i < furgonetas.length; ++i) {

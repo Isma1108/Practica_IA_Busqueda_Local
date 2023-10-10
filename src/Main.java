@@ -47,9 +47,9 @@ public class Main {
     System.out.println("Indica la seed: ");
     seed = sc.nextInt();
 
-    System.out.println("Selecciona el estado inicial {1: Trivial, 2: Random, 3: Voraz}: ");
+    System.out.println("Selecciona el estado inicial {1: Trivial, 2: Random, 3: Voraz1, 4: Voraz2}: ");
     solucion = sc.nextInt();
-    if (solucion < 1 || solucion > 3) System.exit(-1);
+    if (solucion < 1 || solucion > 4) System.exit(-1);
 
     System.out.println("Selecciona la heurística {1: Max. beneficio por traslado, 2: 1 + transporte}: ");
     heuristica = sc.nextInt();
@@ -71,10 +71,13 @@ public class Main {
         board.generar_solucion_random();
         break;
       case 3:
-        board.generar_solucion_voraz();
+        board.generar_solucion_voraz1();
+        break;
+      case 4:
+        board.generar_solucion_voraz2();
         break;
       default:
-        board.generar_solucion_voraz();
+        board.generar_solucion_voraz1();
         break;
     }
     //Si la sol. inicial es trivial el benefico será obviamente de 0, y mucho mejor en la greedy.
