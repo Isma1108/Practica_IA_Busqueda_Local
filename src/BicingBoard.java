@@ -38,13 +38,24 @@ public class BicingBoard {
     }
     furgonetas = new int[Math.min(nfurg, estaciones.size())][5];
     for (int i = 0; i < furgonetas.length; i++) {
-      furgonetas[i][0] = -1;
-      furgonetas[i][1] = -1;
-      furgonetas[i][3] = -1;
+      furgonetas[i][ORIGEN] = -1;
+      furgonetas[i][DESTINO1] = -1;
+      furgonetas[i][DESTINO2] = -1;
     }
     origenOcupado = new boolean[e.size()];
     // By default boolean is false
     // for (int i = 0; i < origenOcupado.length; i++) origenOcupado[i] = false;
+  }
+
+  public BicingBoard(int[][] furgs) {
+    furgonetas = new int[furgs.length][5];
+    for (int i = 0; i < furgs.length; ++i) {
+      furgonetas[i][ORIGEN] = furgs[i][ORIGEN];
+      furgonetas[i][DESTINO1] = furgs[i][DESTINO1];
+      furgonetas[i][BICIS1] = furgs[i][BICIS1];
+      furgonetas[i][DESTINO2] = furgs[i][DESTINO2];
+      furgonetas[i][BICIS2] = furgs[i][BICIS2];
+    }
   }
 
 
@@ -136,10 +147,6 @@ public class BicingBoard {
       }
     });
 
-    for (int i = 0; i < estaciones.size(); ++i) {
-      System.out.println(estaciones.get(i).getDemanda() - estaciones.get(i).getNumBicicletasNext());
-    }
-
     for (int i = 0; i < furgonetas.length; ++i) {
       furgonetas[i][ORIGEN] = i;
       furgonetas[i][DESTINO1] = furgonetas.length - 1 - i;
@@ -150,26 +157,97 @@ public class BicingBoard {
   }
 
   //Operadores:
-  //Python suca blyad
+  
+  public void cambiar_destino1(int ifurg, int iest) {
+    furgonetas[ifurg][DESTINO1] = iest;
+  }
+
+  public void cambiar_destino2(int ifurg, int iest) {
+    furgonetas[ifurg][DESTINO2] = iest;
+  }
+
+  public boolean puede_cambiar_destino1(int ifurg, int iest) {
+    return furgonetas[ifurg][ORIGEN] != -1;
+  }
+  
+  public boolean puede_cambiar_destino2(int ifurg, int iest) {
+    return furgonetas[ifurg][DESTINO2] != -1;
+  }
+
+  
 
 
   //Calidad de la solución + heurísticas
 
   public double getBeneficio() {
-    return 0.0; 
+    double bnf = 0.0;
+    int[] bicis_t = new int[estaciones.size()];
+    int[] bicis_q = new int[estaciones.size()];
+    
+    
+    for (int i = 0; i < furgonetas.length; ++i) {
+      if (furgonetas[i][ORIGEN] != -1 && furgonetas[i][DESTINO1] != -1) {
+        bicis_q[furgonetas[i][ORIGEN]] -= (furgonetas[i][BICIS1] + furgonetas[i][BICIS2]);
+        bicis_t[furgonetas[i][DESTINO1]] += furgonetas[i][BICIS1];
+        if (furgonetas[i][DESTINO2] != -1) bicis_t[furgonetas[i][DESTINO2]] += furgonetas[i][BICIS2];
+
+        //El coste del transporte
+        int x_orig = estaciones.get(furgonetas[i][ORIGEN]).getCoordX();
+        int y_orig = estaciones.get(furgonetas[i][ORIGEN]).getCoordY();
+      
+        int x_d1 = estaciones.get(furgonetas[i][DESTINO1]).getCoordX();
+        int y_d1 = estaciones.get(furgonetas[i][DESTINO1]).getCoordY();
+      
+        int recorrido1 = dist(x_orig, y_orig, x_d1, y_d1);
+        bnf -= ((double) (furgonetas[i][BICIS1] + furgonetas[i][BICIS2] + 9) / 10)*recorrido1/1000; 
+      
+
+        if (furgonetas[i][DESTINO2] != -1) {
+          int x_d2 = estaciones.get(furgonetas[i][DESTINO1]).getCoordX();
+          int y_d2 = estaciones.get(furgonetas[i][DESTINO2]).getCoordY();
+          int recorrido2 = dist(x_d1, y_d1, x_d2, y_d2);
+          bnf -= ((double) (furgonetas[i][BICIS2] + 9) / 10)*recorrido2/1000; 
+        }
+      }
+    }
+
+    //Ahora los gastos/beneficio por alejarme/acercarme a la demanda.
+    for (int i = 0; i < estaciones.size(); ++i) {
+      //Beneficio
+      if (estaciones.get(i).getDemanda() - (estaciones.get(i).getNumBicicletasNext() + bicis_t[i]) <= 0) 
+        bnf += Math.max(0, estaciones.get(i).getDemanda() - estaciones.get(i).getNumBicicletasNext());
+      else bnf += bicis_t[i];
+
+      //Coste
+      if (estaciones.get(i).getDemanda() - (estaciones.get(i).getNumBicicletasNext() - bicis_q[i]) > 0)
+        bnf -= (bicis_q[i] - Math.max(0, estaciones.get(i).getNumBicicletasNext() - estaciones.get(i).getDemanda()));
+    }
+    return bnf;
   }
 
   public double getPrecio1() {
     return 0.0; 
   }
   public double getPrecio2() {
-    return 0.0; 
+    return -getBeneficio();
   }
+
+  //Getters
+  public int[][] getFurgonetas() {
+    return furgonetas;
+  }
+
+  public int getNumFurgos() {
+    return furgonetas.length;
+  }
+
+  public int getNumEstaciones() {
+    return estaciones.size();
+  }
+
   
 
-  //Maximo de 2 numeros
-  public static int max(int numero1, int numero2) {
-    if (numero1 > numero2) return numero1;
-    else return numero2;
+  private static int dist(int x1, int y1, int x2, int y2) {
+    return Math.abs(x2 - x1) + Math.abs(y2 - y1);
   }
 };

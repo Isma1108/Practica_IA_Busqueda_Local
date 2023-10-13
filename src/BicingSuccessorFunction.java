@@ -11,10 +11,28 @@ public class BicingSuccessorFunction implements SuccessorFunction {
     ArrayList retVal = new ArrayList();
     BicingBoard board = (BicingBoard) aState;
 
-    
-    //añadimos a retval todos los estados a los que puedo llegar
-    //aplicando mis operadores
+    for (int i = 0; i < board.getNumFurgos(); ++i) {
+      for (int j = 0; j < board.getNumEstaciones(); ++j) {
+        BicingBoard newBoard = new BicingBoard(board.getFurgonetas()); //Copia
 
+        if (newBoard.puede_cambiar_destino1(i, j)) {
+          newBoard.cambiar_destino1(i,j);
+          retVal.add(new Successor("", newBoard));
+        }
+      }
+    }
+    
+    for (int i = 0; i < board.getNumFurgos(); ++i) {
+      for (int j = 0; j < board.getNumEstaciones(); ++j) {
+        BicingBoard newBoard = new BicingBoard(board.getFurgonetas()); //Copia
+
+        if (newBoard.puede_cambiar_destino2(i, j)) {
+          newBoard.cambiar_destino2(i,j);
+          retVal.add(new Successor("", newBoard));
+        }
+      }
+    }
+    
     return retVal;
   }
 }
