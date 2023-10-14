@@ -283,7 +283,31 @@ public class BicingBoard {
   }
 
   public double getPrecio1() {
-    return 0.0; 
+    double bnf = 0.0;
+    int[] bicis_t = new int[estaciones.size()];
+    int[] bicis_q = new int[estaciones.size()];
+    
+    
+    for (int i = 0; i < furgonetas.length; ++i) {
+      if (furgonetas[i][ORIGEN] != -1 && furgonetas[i][DESTINO1] != -1) {
+        bicis_q[furgonetas[i][ORIGEN]] -= (furgonetas[i][BICIS1] + furgonetas[i][BICIS2]);
+        bicis_t[furgonetas[i][DESTINO1]] += furgonetas[i][BICIS1];
+        if (furgonetas[i][DESTINO2] != -1) bicis_t[furgonetas[i][DESTINO2]] += furgonetas[i][BICIS2];
+      }
+    }
+
+    //Ahora los gastos/beneficio por alejarme/acercarme a la demanda.
+    for (int i = 0; i < estaciones.size(); ++i) {
+      //Beneficio
+      if (estaciones.get(i).getDemanda() - (estaciones.get(i).getNumBicicletasNext() + bicis_t[i]) <= 0) 
+        bnf += Math.max(0, estaciones.get(i).getDemanda() - estaciones.get(i).getNumBicicletasNext());
+      else bnf += bicis_t[i];
+
+      //Coste
+      if (estaciones.get(i).getDemanda() - (estaciones.get(i).getNumBicicletasNext() - bicis_q[i]) > 0)
+        bnf -= (bicis_q[i] - Math.max(0, estaciones.get(i).getNumBicicletasNext() - estaciones.get(i).getDemanda()));
+    }
+    return -bnf;
   }
   public double getPrecio2() {
     return -getBeneficio();
