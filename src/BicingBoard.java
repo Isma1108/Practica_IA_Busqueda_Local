@@ -122,10 +122,6 @@ public class BicingBoard {
       }
     });
 
-    for (int i = 0; i < estaciones.size(); ++i) {
-      System.out.println(estaciones.get(i).getDemanda());
-    }
-
     for (int i = 0; i < furgonetas.length; ++i) {
       furgonetas[i][ORIGEN] = i;
       furgonetas[i][DESTINO1] = furgonetas.length - 1 - i;
@@ -136,7 +132,6 @@ public class BicingBoard {
   }
 
    public void generar_solucion_voraz2() {
-    //Arrays.sort(SrtDemands, new DemandCompare());
     Collections.sort(estaciones, new Comparator<Estacion>() {
       public int compare (Estacion a, Estacion b) {
 
@@ -172,6 +167,16 @@ public class BicingBoard {
   
   public boolean puede_cambiar_destino2(int ifurg, int iest) {
     return furgonetas[ifurg][DESTINO2] != -1;
+  }
+
+  public void swap_origins(int ifurg1, int ifurg2) {
+    int temp = furgonetas[ifurg1][ORIGEN];
+    furgonetas[ifurg1][ORIGEN] = furgonetas[ifurg2][ORIGEN];
+    furgonetas[ifurg2][ORIGEN] = temp;
+  }
+
+  public void add_2ndDestination(int ifurg, int iest) {
+    furgonetas[ifurg][DESTINO2] = iest;
   }
 
   
@@ -243,6 +248,14 @@ public class BicingBoard {
 
   public int getNumEstaciones() {
     return estaciones.size();
+  }
+
+  public int getDestino2(int ifurg) {
+    return furgonetas[ifurg][DESTINO2];
+  }
+
+  public int getOrigen(int ifurg) {
+    return furgonetas[ifurg][ORIGEN];
   }
 
   
