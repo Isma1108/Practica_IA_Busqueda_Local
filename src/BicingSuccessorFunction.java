@@ -52,6 +52,17 @@ public class BicingSuccessorFunction implements SuccessorFunction {
       }
     }
 
+    for (int i = 0; i < board.getNumFurgos(); ++i) {
+      for (int j = i + 1; j < board.getNumFurgos(); ++j) {
+        BicingBoard newBoard = new BicingBoard(board.getFurgonetas()); //Copia
+
+        if (newBoard.getDestino1(i) != newBoard.getDestino2(j))  {
+          newBoard.swap_destination1(i,j);
+          retVal.add(new Successor("", newBoard));
+        }
+      }
+    }
+
     return retVal;
   }
 }

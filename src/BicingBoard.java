@@ -71,7 +71,7 @@ public class BicingBoard {
       furgonetas[i][ORIGEN] = temp;
     }
     for (int i = 0; i < furgonetas.length; i++) {
-      destinoFullRandom(furgonetas[i], random);
+      destinoGreedyRandom(furgonetas[i], random);
     }
   }
 
@@ -109,7 +109,7 @@ public class BicingBoard {
       int demanda = estaciones.get(furgoneta[ORIGEN]).getDemanda();
       int diff = bicisNoUsadas + bicisSigHora - demanda;
 
-      furgoneta[BICIS1] = random.nextInt(0, Math.min(bicisNoUsadas, diff) + 1);
+      furgoneta[BICIS1] = random.nextInt(0, Math.max(0,Math.min(bicisNoUsadas, diff)) + 1);
       bicisNoUsadas = bicisNoUsadas - furgoneta[BICIS1];
       diff = diff - furgoneta[BICIS1];
 
@@ -117,7 +117,7 @@ public class BicingBoard {
       if (furgoneta[DESTINO2] != -1 && estaciones.size() > 2) {
         do furgoneta[DESTINO2] = random.nextInt(0, estaciones.size());
         while (furgoneta[DESTINO2] == furgoneta[ORIGEN] && furgoneta[DESTINO2] == furgoneta[DESTINO1]);
-        furgoneta[BICIS2] = random.nextInt(0, Math.min(bicisNoUsadas, diff) + 1);
+        furgoneta[BICIS2] = random.nextInt(0, Math.max(0,Math.min(bicisNoUsadas, diff)) + 1);
 
       }
     }
@@ -172,17 +172,26 @@ public class BicingBoard {
   }
 
   public boolean puede_cambiar_destino1(int ifurg, int iest) {
-    return furgonetas[ifurg][ORIGEN] != -1;
+    return furgonetas[ifurg][DESTINO1] != -1;
   }
-  
+
   public boolean puede_cambiar_destino2(int ifurg, int iest) {
     return furgonetas[ifurg][DESTINO2] != -1;
   }
-
+  
+  
   public void swap_origins(int ifurg1, int ifurg2) {
     int temp = furgonetas[ifurg1][ORIGEN];
     furgonetas[ifurg1][ORIGEN] = furgonetas[ifurg2][ORIGEN];
+    furgonetas[ifurg1][BICIS1] = estaciones.get(furgonetas[ifurg1][ORIGEN]).getNumBicicletasNoUsadas();
     furgonetas[ifurg2][ORIGEN] = temp;
+    furgonetas[ifurg2][BICIS1] = estaciones.get(furgonetas[ifurg2][ORIGEN]).getNumBicicletasNoUsadas();
+  }
+
+  public void swap_destination1(int ifurg1, int ifurg2) {
+    int temp = furgonetas[ifurg1][DESTINO1];
+    furgonetas[ifurg1][DESTINO1] = furgonetas[ifurg2][DESTINO1];
+    furgonetas[ifurg2][DESTINO1] = temp;
   }
 
   public void add_2ndDestination(int ifurg, int iest) {
@@ -258,6 +267,10 @@ public class BicingBoard {
 
   public int getNumEstaciones() {
     return estaciones.size();
+  }
+
+  public int getDestino1(int ifurg) {
+    return furgonetas[ifurg][DESTINO1];
   }
 
   public int getDestino2(int ifurg) {
