@@ -198,6 +198,39 @@ public class BicingBoard {
     furgonetas[ifurg][DESTINO2] = iest;
   }
 
+  public boolean puedeAñadirBicicleta(int ifurg) {
+    return furgonetas[ifurg][BICIS1] + furgonetas[ifurg][BICIS2] < 30;
+  }
+
+  public void añadirBicicletaDestino1(int ifurg) {
+    furgonetas[ifurg][BICIS1] += 1;
+  }
+
+  public void añadirBicicletaDestino2(int ifurg) {
+    furgonetas[ifurg][BICIS2] += 1;
+  }
+
+  public void quitarBicicletaDestino1(int ifurg) {
+    furgonetas[ifurg][BICIS1] -= 1;
+  }
+
+  public void quitarBicicletaDestino2(int ifurg) {
+    furgonetas[ifurg][BICIS2] -= 1;
+  }
+
+  public void eliminarDestino2(int ifurg) {
+    furgonetas[ifurg][DESTINO2] = -1;
+    furgonetas[ifurg][BICIS2] = 0;
+  }
+
+  public final int getBicisDestino1(int ifurg) {
+    return furgonetas[ifurg][BICIS1];
+  }
+
+  public final int getBicisDestino2(int ifurg) {
+    return furgonetas[ifurg][BICIS2];
+  }
+
   
 
 
