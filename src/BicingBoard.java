@@ -25,17 +25,12 @@ public class BicingBoard {
    * estacion-i hacia un destino estacion-j
   */
 
-  private int[] bicisSigHora; // Contar las bicis que habran en la siguiente hora
   //constructores
 
   
   public BicingBoard(Estaciones e, int nfurg) {
     estaciones = e;    
 
-    bicisSigHora = new int[e.size()];
-    for (int i = 0; i < bicisSigHora.length; i++) {
-      bicisSigHora[i] = 0;
-    }
     furgonetas = new int[Math.min(nfurg, estaciones.size())][5];
     for (int i = 0; i < furgonetas.length; i++) {
       furgonetas[i][ORIGEN] = -1;
@@ -63,8 +58,6 @@ public class BicingBoard {
   public void generar_solucion_trivial() {
     for (int i = 0; i < furgonetas.length; i++)
       furgonetas[i][ORIGEN] = i;
-    for (int i = 0; i < bicisSigHora.length; i++)
-      bicisSigHora[i] = estaciones.get(i).getNumBicicletasNoUsadas() + estaciones.get(i).getNumBicicletasNext();
   }
   
   public void generar_solucion_random() {
@@ -93,7 +86,6 @@ public class BicingBoard {
       int bicisNoUsadas = estaciones.get(furgoneta[ORIGEN]).getNumBicicletasNoUsadas();
 
       furgoneta[BICIS1] = random.nextInt(0, Math.min(30, bicisNoUsadas) + 1);
-      bicisSigHora[furgoneta[DESTINO1]] += furgoneta[BICIS1];
       bicisNoUsadas = bicisNoUsadas - furgoneta[BICIS1];
 
       furgoneta[DESTINO2] = -random.nextInt(0, 1);
@@ -102,13 +94,33 @@ public class BicingBoard {
         while (furgoneta[DESTINO2] == furgoneta[ORIGEN] && furgoneta[DESTINO2] == furgoneta[DESTINO1]);
         furgoneta[BICIS2] = random.nextInt(0, Math.min(30, bicisNoUsadas) + 1);
       
-        bicisSigHora[furgoneta[DESTINO2]] += furgoneta[BICIS2];
       }
     }
   }
 
   private void destinoGreedyRandom(int[] furgoneta, Random random) {
-    
+    furgoneta[DESTINO1] = -random.nextInt(0, 2);
+    if (furgoneta[DESTINO1] != -1 && estaciones.size() > 1) {
+      do furgoneta[DESTINO1] = random.nextInt(0, estaciones.size());
+      while (furgoneta[DESTINO1] == furgoneta[ORIGEN] && estaciones.size() > 1);
+
+      int bicisNoUsadas = estaciones.get(furgoneta[ORIGEN]).getNumBicicletasNoUsadas();
+      int bicisSigHora = estaciones.get(furgoneta[ORIGEN]).getNumBicicletasNext();
+      int demanda = estaciones.get(furgoneta[ORIGEN]).getDemanda();
+      int diff = bicisNoUsadas + bicisSigHora - demanda;
+
+      furgoneta[BICIS1] = random.nextInt(0, Math.min(bicisNoUsadas, diff) + 1);
+      bicisNoUsadas = bicisNoUsadas - furgoneta[BICIS1];
+      diff = diff - furgoneta[BICIS1];
+
+      furgoneta[DESTINO2] = -random.nextInt(0, 1);
+      if (furgoneta[DESTINO2] != -1 && estaciones.size() > 2) {
+        do furgoneta[DESTINO2] = random.nextInt(0, estaciones.size());
+        while (furgoneta[DESTINO2] == furgoneta[ORIGEN] && furgoneta[DESTINO2] == furgoneta[DESTINO1]);
+        furgoneta[BICIS2] = random.nextInt(0, Math.min(bicisNoUsadas, diff) + 1);
+
+      }
+    }
   }
 
   // genera una solución voraz: Furgoneta en estación con menos demanda se dirige a la que tiene más demanda
@@ -126,7 +138,6 @@ public class BicingBoard {
       furgonetas[i][ORIGEN] = i;
       furgonetas[i][DESTINO1] = furgonetas.length - 1 - i;
       furgonetas[i][BICIS1] = estaciones.get(furgonetas[i][ORIGEN]).getNumBicicletasNoUsadas();
-      bicisSigHora[furgonetas[i][DESTINO1]] = furgonetas[i][BICIS1] + estaciones.get(furgonetas[i][DESTINO1]).getNumBicicletasNext();
     }
 
   }
@@ -146,7 +157,6 @@ public class BicingBoard {
       furgonetas[i][ORIGEN] = i;
       furgonetas[i][DESTINO1] = furgonetas.length - 1 - i;
       furgonetas[i][BICIS1] = estaciones.get(furgonetas[i][ORIGEN]).getNumBicicletasNoUsadas();
-      bicisSigHora[furgonetas[i][DESTINO1]] = furgonetas[i][BICIS1] + estaciones.get(furgonetas[i][DESTINO1]).getNumBicicletasNext();
     }
 
   }
