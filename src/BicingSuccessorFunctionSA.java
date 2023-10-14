@@ -19,8 +19,8 @@ public class BicingSuccessorFunctionSA implements SuccessorFunction {
     i = myRandom.nextInt(board.getNumFurgos());
     j = myRandom.nextInt(board.getNumEstaciones());
 
-    BicingBoard newBoard = new BicingBoard(board.getFurgonetas());
-    newBoard.cambiar_destino1(i,j);
+    BicingBoard newBoard = new BicingBoard(board.getFurgonetas(), board.getLibres());
+    newBoard.cambiarDestino1(i,j);
     retVal.add(new Successor("", newBoard));
 
     return retVal;
