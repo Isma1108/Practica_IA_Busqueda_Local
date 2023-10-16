@@ -11,11 +11,13 @@ public class BicingSuccessorFunction implements SuccessorFunction {
     ArrayList retVal = new ArrayList();
     BicingBoard board = (BicingBoard) aState;
 
-
+    
     //Cambiar el destino 1
+
+    
     for (int i = 0; i < board.getNumFurgos(); ++i) {
       for (int j = 0; j < board.getNumEstaciones(); ++j) {
-        BicingBoard newBoard = new BicingBoard(board.getFurgonetas());
+        BicingBoard newBoard = new BicingBoard(board.getOrigenesOcupados(), board.getFurgonetas());
 
         newBoard.cambiar_destino1(i,j);
         retVal.add(new Successor("", newBoard));
@@ -25,20 +27,35 @@ public class BicingSuccessorFunction implements SuccessorFunction {
     //Cambiar el destino 2
     for (int i = 0; i < board.getNumFurgos(); ++i) {
       for (int j = 0; j < board.getNumEstaciones(); ++j) {
-        BicingBoard newBoard = new BicingBoard(board.getFurgonetas()); //Copia
+        BicingBoard newBoard = new BicingBoard(board.getOrigenesOcupados(), board.getFurgonetas()); //Copia
 
         if (newBoard.puede_cambiar_destino2(i, j)) {
           newBoard.cambiar_destino2(i,j);
           retVal.add(new Successor("", newBoard));
         }
       }
-
     }
 
+    
+    
+
+    //Cambiar origen
+
+    for (int i = 0; i < board.getNumFurgos(); ++i) {
+      for (int j = 0; j < board.getNumEstaciones(); ++j) {
+        BicingBoard newBoard = new BicingBoard(board.getOrigenesOcupados(), board.getFurgonetas()); //Copia
+
+        newBoard.cambiar_origen(i,j);
+        retVal.add(new Successor("", newBoard));
+      }
+    }
+
+    
+    
     //Swap destins
     for (int i = 0; i < board.getNumFurgos(); ++i) {
       for (int j = 0; j < board.getNumFurgos(); ++j) {
-        BicingBoard newBoard = new BicingBoard(board.getFurgonetas()); //Copia
+        BicingBoard newBoard = new BicingBoard(board.getOrigenesOcupados(), board.getFurgonetas()); //Copia
         if (newBoard.puede_swap_d1(i, j)) {
           newBoard.swap_d1(i, j);
           retVal.add(new Successor("", newBoard));
@@ -48,13 +65,15 @@ public class BicingSuccessorFunction implements SuccessorFunction {
 
     for (int i = 0; i < board.getNumFurgos(); ++i) {
       for (int j = 0; j < board.getNumFurgos(); ++j) {
-        BicingBoard newBoard = new BicingBoard(board.getFurgonetas()); //Copia
+        BicingBoard newBoard = new BicingBoard(board.getOrigenesOcupados(), board.getFurgonetas()); //Copia
         if (newBoard.puede_swap_d2(i, j)) {
           newBoard.swap_d2(i, j);
           retVal.add(new Successor("", newBoard));
         }
       }
     }
+
+    
 
     /*
     for (int i = 0; i < board.getNumFurgos(); ++i) {
@@ -87,6 +106,7 @@ public class BicingSuccessorFunction implements SuccessorFunction {
       }
     }
     */
+
 
     return retVal;
   }

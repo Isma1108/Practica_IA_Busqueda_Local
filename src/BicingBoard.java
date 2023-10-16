@@ -55,6 +55,21 @@ public class BicingBoard {
     }
   }
 
+  public BicingBoard(boolean[] orig, int[][] furgs) {
+    furgonetas = new int[furgs.length][5];
+    for (int i = 0; i < furgs.length; ++i) {
+      furgonetas[i][ORIGEN] = furgs[i][ORIGEN];
+      furgonetas[i][DESTINO1] = furgs[i][DESTINO1];
+      furgonetas[i][BICIS1] = furgs[i][BICIS1];
+      furgonetas[i][DESTINO2] = furgs[i][DESTINO2];
+      furgonetas[i][BICIS2] = furgs[i][BICIS2];
+    }
+    origenOcupado = new boolean[orig.length];
+    for (int i = 0; i < orig.length; ++i) {
+      origenOcupado[i] = orig[i];
+    }
+  }
+
   //------------------------------------------------------------------------------
 
   //----------------------SOLUCIONES INICIALES--------------------------
@@ -214,6 +229,30 @@ public class BicingBoard {
       furgonetas[ifurg][BICIS1] += furgonetas[ifurg][BICIS2];
       furgonetas[ifurg][BICIS2] = 0;
     }
+  }
+
+
+  public void cambiar_origen(int ifurg, int iest) {
+      if (origenOcupado[iest] || furgonetas[ifurg][DESTINO1] == iest || furgonetas[ifurg][DESTINO2] == iest) {
+        furgonetas[ifurg][ORIGEN] = -1;
+        furgonetas[ifurg][DESTINO1] = -1;
+        furgonetas[ifurg][BICIS1] = 0;
+        furgonetas[ifurg][DESTINO2] = -1;
+        furgonetas[ifurg][BICIS2] = 0;
+      }
+
+      else {
+        furgonetas[ifurg][ORIGEN] = iest;
+
+        if (furgonetas[ifurg][DESTINO1] != -1) {
+          furgonetas[ifurg][BICIS1] = Math.max(0, getMaxBicis(furgonetas[ifurg][ORIGEN]));
+          int bicis_d1 = Math.max(0, furgonetas[ifurg][BICIS1] - getBicisNecesitadas(furgonetas[ifurg][DESTINO1]));
+          if (furgonetas[ifurg][DESTINO2] != -1) {
+            furgonetas[ifurg][BICIS2] = bicis_d1;
+            furgonetas[ifurg][BICIS1] -= bicis_d1;
+          }
+        }
+      }
   }
 
   
@@ -382,6 +421,10 @@ public class BicingBoard {
 
   public int[][] getFurgonetas() {
     return furgonetas;
+  }
+
+  public boolean[] getOrigenesOcupados() {
+    return origenOcupado;
   }
 
   public int getNumFurgos() {
