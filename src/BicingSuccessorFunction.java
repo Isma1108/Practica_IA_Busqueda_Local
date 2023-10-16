@@ -11,18 +11,18 @@ public class BicingSuccessorFunction implements SuccessorFunction {
     ArrayList retVal = new ArrayList();
     BicingBoard board = (BicingBoard) aState;
 
-    
+
+    //Cambiar el destino 1
     for (int i = 0; i < board.getNumFurgos(); ++i) {
       for (int j = 0; j < board.getNumEstaciones(); ++j) {
         BicingBoard newBoard = new BicingBoard(board.getFurgonetas());
 
-        if (newBoard.puede_cambiar_destino1(i, j)) {
-          newBoard.cambiar_destino1(i,j);
-          retVal.add(new Successor("", newBoard));
-        }
+        newBoard.cambiar_destino1(i,j);
+        retVal.add(new Successor("", newBoard));
       }
     }    
 
+    //Cambiar el destino 2
     for (int i = 0; i < board.getNumFurgos(); ++i) {
       for (int j = 0; j < board.getNumEstaciones(); ++j) {
         BicingBoard newBoard = new BicingBoard(board.getFurgonetas()); //Copia
@@ -32,36 +32,59 @@ public class BicingSuccessorFunction implements SuccessorFunction {
           retVal.add(new Successor("", newBoard));
         }
       }
+
     }
 
+    //Swap destins
     for (int i = 0; i < board.getNumFurgos(); ++i) {
-      for (int j = 0; j < board.getNumEstaciones(); ++j) {
+      for (int j = 0; j < board.getNumFurgos(); ++j) {
         BicingBoard newBoard = new BicingBoard(board.getFurgonetas()); //Copia
-
-        if (newBoard.getDestino2(i) != j && newBoard.getOrigen(i) != j) newBoard.add_2ndDestination(i,j);
-        
-        retVal.add(new Successor("", newBoard));
-      }
-    }
-
-    for (int i = 0; i < board.getNumFurgos(); ++i) {
-      for (int j = i + 1; j < board.getNumFurgos(); ++j) {
-        BicingBoard newBoard = new BicingBoard(board.getFurgonetas()); //Copia
-        newBoard.swap_origins(i,j);
-        retVal.add(new Successor("", newBoard));
-      }
-    }
-
-    for (int i = 0; i < board.getNumFurgos(); ++i) {
-      for (int j = i + 1; j < board.getNumFurgos(); ++j) {
-        BicingBoard newBoard = new BicingBoard(board.getFurgonetas()); //Copia
-
-        if (newBoard.getDestino1(i) != newBoard.getDestino2(j))  {
-          newBoard.swap_destination1(i,j);
+        if (newBoard.puede_swap_d1(i, j)) {
+          newBoard.swap_d1(i, j);
           retVal.add(new Successor("", newBoard));
         }
       }
     }
+
+    for (int i = 0; i < board.getNumFurgos(); ++i) {
+      for (int j = 0; j < board.getNumFurgos(); ++j) {
+        BicingBoard newBoard = new BicingBoard(board.getFurgonetas()); //Copia
+        if (newBoard.puede_swap_d2(i, j)) {
+          newBoard.swap_d2(i, j);
+          retVal.add(new Successor("", newBoard));
+        }
+      }
+    }
+
+    for (int i = 0; i < board.getNumFurgos(); ++i) {
+      BicingBoard newBoard = new BicingBoard(board.getFurgonetas()); //Copia
+      if (newBoard.puede_furgo_swap(i)) {
+      
+      }
+
+    }
+
+    /*
+    for (int i = 0; i < board.getNumFurgos(); ++i) {
+      for (int j = 0; j < board.getNumFurgos(); ++j) {
+        BicingBoard newBoard = new BicingBoard(board.getFurgonetas()); //Copia
+        if (newBoard.puede_swap_d12(i, j)) {
+          newBoard.swap_d12(i, j);
+          retVal.add(new Successor("", newBoard));
+        }
+      }
+    }
+    
+    for (int i = 0; i < board.getNumFurgos(); ++i) {
+      for (int j = 0; j < board.getNumFurgos(); ++j) {
+        BicingBoard newBoard = new BicingBoard(board.getFurgonetas()); //Copia
+        if (newBoard.puede_swap_d21(i, j)) {
+          newBoard.swap_d21(i, j);
+          retVal.add(new Successor("", newBoard));
+        }
+      }
+    }
+    */
 
     return retVal;
   }
