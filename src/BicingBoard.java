@@ -269,13 +269,6 @@ public class BicingBoard {
   }
 
 
-  //Swap destino 1 
-  public void puede_furgo_swap(int ifurg) {
-    int tmp = furgonetas[ifurg][DESTINO1];
-    furgonetas[ifurg][DESTINO1] = furgonetas[ifurg][DESTINO2];
-    furgonetas[ifurg][DESTINO2] = tmp;
-  }
-
 
   //--------------CALIDAD DE LA SOLUCION------------------------ 
 

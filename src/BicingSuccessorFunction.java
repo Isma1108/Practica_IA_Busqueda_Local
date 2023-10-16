@@ -56,6 +56,7 @@ public class BicingSuccessorFunction implements SuccessorFunction {
       }
     }
 
+    /*
     for (int i = 0; i < board.getNumFurgos(); ++i) {
       BicingBoard newBoard = new BicingBoard(board.getFurgonetas()); //Copia
       if (newBoard.puede_furgo_swap(i)) {
@@ -63,6 +64,7 @@ public class BicingSuccessorFunction implements SuccessorFunction {
       }
 
     }
+    */
 
     /*
     for (int i = 0; i < board.getNumFurgos(); ++i) {
