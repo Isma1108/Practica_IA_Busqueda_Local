@@ -20,7 +20,7 @@ public class BicingSuccessorFunction implements SuccessorFunction {
         BicingBoard newBoard = new BicingBoard(board.getOrigenesOcupados(), board.getFurgonetas());
 
         newBoard.cambiar_destino1(i,j);
-        retVal.add(new Successor("", newBoard));
+        retVal.add(new Successor("change destination1 of furgo " + i + " to " + j, newBoard));
       }
     }    
 
@@ -31,7 +31,7 @@ public class BicingSuccessorFunction implements SuccessorFunction {
 
         if (newBoard.puede_cambiar_destino2(i, j)) {
           newBoard.cambiar_destino2(i,j);
-          retVal.add(new Successor("", newBoard));
+          retVal.add(new Successor("change destination2 of furgo " + i + " to " + j, newBoard));
         }
       }
     }
