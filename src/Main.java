@@ -25,11 +25,11 @@ public class Main {
 
   public static void defVars() {
     Scanner sc = new Scanner(System.in);
-
-    System.out.println("Indica el número de estaciones: ");
+    
+    System.out.print("Indica el número de estaciones: ");
     nest = sc.nextInt();
 
-    System.out.println("Indica el número de bicicletas totales: ");
+    System.out.print("Indica el número de bicicletas totales: ");
     nbic = sc.nextInt();
 
     if (nest*50 > nbic) {
@@ -37,25 +37,25 @@ public class Main {
             System.exit(-1);
     }
 
-    System.out.println("Indica el número de furgonetas: ");
+    System.out.print("Indica el número de furgonetas: ");
     nfurg = sc.nextInt();
     
-    System.out.println("Indica el tipo de demanda {1: equiilibrada, 2: hora punta}: ");
+    System.out.print("Indica el tipo de demanda {1: equiilibrada, 2: hora punta}: ");
     dem = sc.nextInt();
     dem = (dem == 2) ? Estaciones.RUSH_HOUR : Estaciones.EQUILIBRIUM;
     
-    System.out.println("Indica la seed: ");
+    System.out.print("Indica la seed: ");
     seed = sc.nextInt();
 
-    System.out.println("Selecciona el estado inicial {1: Trivial, 2: Random, 3: Voraz1, 4: Voraz2}: ");
+    System.out.print("Selecciona el estado inicial {1: Trivial, 2: Random, 3: Voraz1, 4: Voraz2}: ");
     solucion = sc.nextInt();
     if (solucion < 1 || solucion > 4) System.exit(-1);
 
-    System.out.println("Selecciona la heurística {1: Max. beneficio por traslado, 2: 1 + transporte}: ");
+    System.out.print("Selecciona la heurística {1: Max. beneficio por traslado, 2: 1 + transporte}: ");
     heuristica = sc.nextInt();
     if (heuristica != 1 && heuristica != 2) System.exit(-1);
 
-    System.out.println("Selecciona el algoritmo de búsqueda local {1: HillClimbing, 2: SA}: ");
+    System.out.print("Selecciona el algoritmo de búsqueda local {1: HillClimbing, 2: SA}: ");
     HillClimbing = sc.nextInt() == 1;
   }
 
@@ -83,6 +83,8 @@ public class Main {
     //Si la sol. inicial es trivial el benefico será obviamente de 0, y mucho mejor en la greedy.
     System.out.println();
     System.out.println("Antes de la búsqueda el benefico es de : " + board.getBeneficio());
+    System.out.println("Antes de la búsqueda el benefico (sin transporte) es de : " + -board.getPrecio1());
+    System.out.println();
 
 
     if (heuristica == 1) {
@@ -108,8 +110,12 @@ public class Main {
       time = System.currentTimeMillis() - time;
       BicingBoard newboard = (BicingBoard) search.getGoalState(); 
       System.out.println("Después de la búsqueda el benefico es de : " + newboard.getBeneficio());
+      System.out.println("Después de la búsqueda el benefico (sin transporte) es de : " + -newboard.getPrecio1());
+      System.out.println("El coste del transporte es de " + newboard.getCosteTransporte());
       System.out.println("Tiempo transcurrido: " + time + " ms");
 
+      System.out.println();
+      printActions(agent.getActions());
       printInstrumentation(agent.getInstrumentation());
     } 
     catch (Exception e) {
@@ -130,8 +136,12 @@ public class Main {
       time = System.currentTimeMillis() - time;
       BicingBoard newboard = (BicingBoard) search.getGoalState(); 
       System.out.println("Después de la búsqueda el benefico es de : " + newboard.getBeneficio());
+      System.out.println("Después de la búsqueda el benefico (sin transporte) es de : " + -newboard.getPrecio1());
+      System.out.println("El coste del transporte es de " + newboard.getCosteTransporte());
       System.out.println("Tiempo transcurrido: " + time + " ms");
-      
+
+      System.out.println();
+      printActions(agent.getActions());
       printInstrumentation(agent.getInstrumentation());
     } 
     catch (Exception e) {
@@ -152,8 +162,12 @@ public class Main {
       time = System.currentTimeMillis() - time;
       BicingBoard newboard = (BicingBoard) search.getGoalState(); 
       System.out.println("Después de la búsqueda el benefico es de : " + newboard.getBeneficio());
+      System.out.println("Después de la búsqueda el benefico (sin transporte) es de : " + -newboard.getPrecio1());
+      System.out.println("El coste del transporte es de " + newboard.getCosteTransporte());
       System.out.println("Tiempo transcurrido: " + time + " ms");
       
+            System.out.println();
+      printActions(agent.getActions());
       printInstrumentation(agent.getInstrumentation());
     } 
     catch (Exception e) {
@@ -174,8 +188,9 @@ public class Main {
       time = System.currentTimeMillis() - time;
       BicingBoard newboard = (BicingBoard) search.getGoalState(); 
       System.out.println("Después de la búsqueda el benefico es de : " + newboard.getBeneficio());
+      System.out.println("Después de la búsqueda el benefico (sin transporte) es de : " + -newboard.getPrecio1());
+      System.out.println("El coste del transporte es de " + newboard.getCosteTransporte());
       System.out.println("Tiempo transcurrido: " + time + " ms");
-      
       printInstrumentation(agent.getInstrumentation());
     } 
     catch (Exception e) {
@@ -188,6 +203,13 @@ public class Main {
       String key = (String) keys.next();
       String property = properties.getProperty(key);
       System.out.println(key + " : " + property);
+    }
+  }
+
+  private static void printActions(List actions) {
+    for (int i = 0; i < actions.size(); i++) {
+        String action = (String) actions.get(i);
+        System.out.println(action);
     }
   }
 }

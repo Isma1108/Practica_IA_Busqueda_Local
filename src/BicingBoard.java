@@ -18,7 +18,6 @@ public class BicingBoard {
 
   private static Estaciones estaciones;
   private int[][] furgonetas;
-  private int[] furgosLibres; // aun no han sido usadas todas las bicis
 
   private boolean[] origenOcupado;
   /*
@@ -26,44 +25,74 @@ public class BicingBoard {
    * estacion-i hacia un destino estacion-j
   */
 
-  //constructores
+  //-----------------CONSTRUCTORAS---------------------
 
   
   public BicingBoard(Estaciones e, int nfurg) {
     estaciones = e;    
 
     furgonetas = new int[Math.min(nfurg, estaciones.size())][5];
-    furgosLibres = new int[furgonetas.length];
     for (int i = 0; i < furgonetas.length; i++) {
       furgonetas[i][ORIGEN] = -1;
+      furgonetas[i][BICIS1] = 0;
+      furgonetas[i][BICIS2] = 0;
       furgonetas[i][DESTINO1] = -1;
       furgonetas[i][DESTINO2] = -1;
-      furgosLibres[i] = 0;
     }
     origenOcupado = new boolean[e.size()];
     // By default boolean is false
     // for (int i = 0; i < origenOcupado.length; i++) origenOcupado[i] = false;
   }
 
-  public BicingBoard(int[][] furgs, int[] furgLib) {
+  public BicingBoard(int[][] furgs) {
     furgonetas = new int[furgs.length][5];
-    furgosLibres = new int[furgs.length];
     for (int i = 0; i < furgs.length; ++i) {
       furgonetas[i][ORIGEN] = furgs[i][ORIGEN];
       furgonetas[i][DESTINO1] = furgs[i][DESTINO1];
       furgonetas[i][BICIS1] = furgs[i][BICIS1];
       furgonetas[i][DESTINO2] = furgs[i][DESTINO2];
       furgonetas[i][BICIS2] = furgs[i][BICIS2];
-      furgosLibres[i] = furgLib[i];
     }
   }
 
-  //Ninguna furgoneta se usa
+  public BicingBoard(boolean[] orig, int[][] furgs) {
+    furgonetas = new int[furgs.length][5];
+    for (int i = 0; i < furgs.length; ++i) {
+      furgonetas[i][ORIGEN] = furgs[i][ORIGEN];
+      furgonetas[i][DESTINO1] = furgs[i][DESTINO1];
+      furgonetas[i][BICIS1] = furgs[i][BICIS1];
+      furgonetas[i][DESTINO2] = furgs[i][DESTINO2];
+      furgonetas[i][BICIS2] = furgs[i][BICIS2];
+    }
+    origenOcupado = new boolean[orig.length];
+    for (int i = 0; i < orig.length; ++i) {
+      origenOcupado[i] = orig[i];
+    }
+  }
+
+  //------------------------------------------------------------------------------
+
+  //----------------------SOLUCIONES INICIALES--------------------------
+
+
+  // Trivial (voraz):
   public void generar_solucion_trivial() {
+    Collections.sort(estaciones, new Comparator<Estacion>() {
+      public int compare (Estacion a, Estacion b) {
+
+        int aDif = Math.min(a.getNumBicicletasNoUsadas(), Math.max(0, a.getNumBicicletasNext() - a.getDemanda()));
+        int bDif = Math.min(b.getNumBicicletasNoUsadas(), Math.max(0, b.getNumBicicletasNext() - b.getDemanda()));
+        
+        return Integer.compare(bDif, aDif);
+      }
+    });
+    
     for (int i = 0; i < furgonetas.length; i++)
       furgonetas[i][ORIGEN] = i;
   }
   
+
+  //Full random:
   public void generar_solucion_random() {
     for (int i = 0; i < furgonetas.length; i++)
       furgonetas[i][ORIGEN] = i;
@@ -75,7 +104,7 @@ public class BicingBoard {
       furgonetas[i][ORIGEN] = temp;
     }
     for (int i = 0; i < furgonetas.length; i++) {
-      destinoGreedyRandom(furgonetas[i], random, i);
+      destinoGreedyRandom(furgonetas[i], random);
     }
   }
 
@@ -102,7 +131,7 @@ public class BicingBoard {
     }
   }
 
-  private void destinoGreedyRandom(int[] furgoneta, Random random, int i) {
+  private void destinoGreedyRandom(int[] furgoneta, Random random) {
     furgoneta[DESTINO1] = -random.nextInt(0, 2);
     if (furgoneta[DESTINO1] != -1 && estaciones.size() > 1) {
       do furgoneta[DESTINO1] = random.nextInt(0, estaciones.size());
@@ -117,8 +146,6 @@ public class BicingBoard {
       bicisNoUsadas = bicisNoUsadas - furgoneta[BICIS1];
       diff = diff - furgoneta[BICIS1];
 
-      furgosLibres[i] = bicisNoUsadas;
-
       furgoneta[DESTINO2] = -random.nextInt(0, 1);
       if (furgoneta[DESTINO2] != -1 && estaciones.size() > 2) {
         do furgoneta[DESTINO2] = random.nextInt(0, estaciones.size());
@@ -129,9 +156,8 @@ public class BicingBoard {
     }
   }
 
-  // genera una solución voraz: Furgoneta en estación con menos demanda se dirige a la que tiene más demanda
-  // La segunda con menos demanda a la segunda con más, y así
-  
+
+  //Voraz 1 (ordenar en base la demanda)
   public void generar_solucion_voraz1() {
     //Arrays.sort(SrtDemands, new DemandCompare());
     Collections.sort(estaciones, new Comparator<Estacion>() {
@@ -142,119 +168,160 @@ public class BicingBoard {
 
     for (int i = 0; i < furgonetas.length; ++i) {
       furgonetas[i][ORIGEN] = i;
-
-      /*
-      furgonetas[i][DESTINO1] = furgonetas.length - 1 - i;
-      furgonetas[i][BICIS1] = estaciones.get(furgonetas[i][ORIGEN]).getNumBicicletasNoUsadas();
-
-      */
-
-      int puedeUsar = calcula_diffOrig(estaciones.get(i));
-
-      int cargaTemp = Math.max(0, Math.min(puedeUsar,30)); // lo que se lleva del origen
-
-      int destinoBicis = calcula_diffDest(estaciones.get(furgonetas.length - 1 - i));   // si es positivo, enviamos
-
-      if (cargaTemp - destinoBicis <= 0) {
-        furgonetas[i][DESTINO1] = -1;
-        furgonetas[i][BICIS1] = 0;
-        furgosLibres[i] = cargaTemp;
-      }
-
-      else {
-        furgonetas[i][DESTINO1] = furgonetas.length - 1 - i;
-        furgonetas[i][BICIS1] = Math.min(cargaTemp, destinoBicis);
-        furgosLibres[i] = Math.max(0, cargaTemp - destinoBicis);
-      }
+      furgonetas[i][DESTINO1] = estaciones.size() - 1 - i;
+      furgonetas[i][BICIS1] = Math.max(0, getMaxBicis(furgonetas[i][ORIGEN]));
     }
 
   }
 
+  //Voraz 2 (ordenar en funcion de las bicis que puedo cojer)
    public void generar_solucion_voraz2() {
     Collections.sort(estaciones, new Comparator<Estacion>() {
       public int compare (Estacion a, Estacion b) {
 
-        int aDif = a.getDemanda() - a.getNumBicicletasNext();
-        int bDif = b.getDemanda() - b.getNumBicicletasNext();
-
-        return aDif - bDif;
+        int aDif = Math.min(a.getNumBicicletasNoUsadas(), Math.max(0, a.getNumBicicletasNext() - a.getDemanda()));
+        int bDif = Math.min(b.getNumBicicletasNoUsadas(), Math.max(0, b.getNumBicicletasNext() - b.getDemanda()));
+        
+        return Integer.compare(bDif, aDif);
       }
     });
 
     for (int i = 0; i < furgonetas.length; ++i) {
       furgonetas[i][ORIGEN] = i;
-
-      /*
-      furgonetas[i][DESTINO1] = furgonetas.length - 1 - i;
-      furgonetas[i][BICIS1] = estaciones.get(furgonetas[i][ORIGEN]).getNumBicicletasNoUsadas();
-
-      */
-
-      int puedeUsar = calcula_diffOrig(estaciones.get(i));
-
-      int cargaTemp = Math.max(0, Math.min(puedeUsar,30)); // lo que se lleva del origen
-
-      int destinoBicis = calcula_diffDest(estaciones.get(furgonetas.length - 1 - i));   // si es positivo, enviamos
-
-      if (cargaTemp - destinoBicis <= 0) {
-        furgonetas[i][DESTINO1] = -1;
-        furgonetas[i][BICIS1] = 0;
-        furgosLibres[i] = cargaTemp;
-      }
-
-      else {
-        furgonetas[i][DESTINO1] = furgonetas.length - 1 - i;
-        furgonetas[i][BICIS1] = Math.min(cargaTemp, destinoBicis);
-        furgosLibres[i] = Math.max(0, cargaTemp - destinoBicis);
-      }
+      furgonetas[i][DESTINO1] = estaciones.size() - 1 - i;
+      furgonetas[i][BICIS1] = Math.max(0, getMaxBicis(furgonetas[i][ORIGEN]));
     }
   }
 
-  public int calcula_diffOrig(Estacion est) {
-    return est.getNumBicicletasNoUsadas() - (est.getDemanda() - est.getNumBicicletasNext());
-  }
-
-  public int calcula_diffDest(Estacion est) {
-    return est.getDemanda() - est.getNumBicicletasNext();
-  }
-
-  //Operadores:
+  //---------------------------OPERADORES--------------------------
   
-  public void cambiarDestino1(int ifurg, int iest) {
+  //Cambirar destino 1:
+  public void cambiar_destino1(int ifurg, int iest) {
+    if (furgonetas[ifurg][DESTINO1] == -1) {
+      furgonetas[ifurg][BICIS1] = Math.max(0, getMaxBicis(furgonetas[ifurg][ORIGEN]));
+    }
     furgonetas[ifurg][DESTINO1] = iest;
+    
+    if (furgonetas[ifurg][ORIGEN] == iest) {
+      //La furgoneta passa a no hacer nada
+      furgonetas[ifurg][DESTINO1] = -1;
+      furgonetas[ifurg][DESTINO2] = -1;
+      furgonetas[ifurg][BICIS1] = 0;
+      furgonetas[ifurg][BICIS2] = 0;
+
+    }
   }
 
-  public boolean puede_cambiar_destino1(int ifurg, int iest) {
-    return furgonetas[ifurg][DESTINO1] != -1;
-  }  
-
-  public void cambiarDestino2(int ifurg, int iest) {
-
+  //Cambiar destino 2:
+  public void cambiar_destino2(int ifurg, int iest) {
+    
+    if (furgonetas[ifurg][DESTINO2] == -1) {
+      //Antes no habia destino 2, ahora si
+      int bicis_d1 = Math.max(0, furgonetas[ifurg][BICIS1] - getBicisNecesitadas(furgonetas[ifurg][DESTINO1]));
+      furgonetas[ifurg][BICIS2] = bicis_d1;
+      furgonetas[ifurg][BICIS1] -= bicis_d1;
+    }
     furgonetas[ifurg][DESTINO2] = iest;
-    furgonetas[ifurg][BICIS2] = furgosLibres[ifurg];
+    
+    if (furgonetas[ifurg][ORIGEN] == iest) {
+      //Ahora no hay destino 2
+      furgonetas[ifurg][DESTINO2] = -1;
+      furgonetas[ifurg][BICIS1] += furgonetas[ifurg][BICIS2];
+      furgonetas[ifurg][BICIS2] = 0;
+    }
   }
 
-  public void swap_origins(int ifurg1, int ifurg2) {
-    int temp = furgonetas[ifurg1][ORIGEN];
-    furgonetas[ifurg1][ORIGEN] = furgonetas[ifurg2][ORIGEN];
-    furgonetas[ifurg1][BICIS1] = estaciones.get(furgonetas[ifurg1][ORIGEN]).getNumBicicletasNoUsadas();
-    furgonetas[ifurg2][ORIGEN] = temp;
-    furgonetas[ifurg2][BICIS1] = estaciones.get(furgonetas[ifurg2][ORIGEN]).getNumBicicletasNoUsadas();
+  // No tiene sentido cambiar origen si no tiene destino o no tiene origen
+
+  public boolean puede_cambiar_origen(int ifurg) {
+    return furgonetas[ifurg][DESTINO1] != -1 && furgonetas[ifurg][ORIGEN] != -1;
   }
 
-  public void swap_destination1(int ifurg1, int ifurg2) {
-    int temp = furgonetas[ifurg1][DESTINO1];
-    furgonetas[ifurg1][DESTINO1] = furgonetas[ifurg2][DESTINO1];
-    furgonetas[ifurg2][DESTINO1] = temp;
+
+  public void cambiar_origen(int ifurg, int iest) {
+      if (origenOcupado[iest]) {
+
+        origenOcupado[furgonetas[ifurg][ORIGEN]] = false;
+        furgonetas[ifurg][ORIGEN] = -1;
+        furgonetas[ifurg][DESTINO1] = -1;
+        furgonetas[ifurg][BICIS1] = 0;
+        furgonetas[ifurg][DESTINO2] = -1;
+        furgonetas[ifurg][BICIS2] = 0;
+      }
+
+      else {
+        
+        if (furgonetas[ifurg][DESTINO1] == iest) furgonetas[ifurg][DESTINO1] = furgonetas[ifurg][ORIGEN];
+        else if (furgonetas[ifurg][DESTINO2] == iest) furgonetas[ifurg][DESTINO2] = furgonetas[ifurg][ORIGEN];
+
+        origenOcupado[furgonetas[ifurg][ORIGEN]] = false;
+        origenOcupado[iest] = true;
+        furgonetas[ifurg][ORIGEN] = iest;
+
+        furgonetas[ifurg][BICIS1] = Math.max(0, getMaxBicis(furgonetas[ifurg][ORIGEN]));
+        int bicis_d1 = Math.max(0, furgonetas[ifurg][BICIS1] - getBicisNecesitadas(furgonetas[ifurg][DESTINO1]));
+        if (furgonetas[ifurg][DESTINO2] != -1) {
+          furgonetas[ifurg][BICIS2] = bicis_d1;
+          furgonetas[ifurg][BICIS1] -= bicis_d1;
+        }
+      }
   }
 
-  public void eliminarDestino2(int ifurg) {
-    furgonetas[ifurg][DESTINO2] = -1;
-    furgonetas[ifurg][BICIS2] = 0;
+  
+  public boolean puede_cambiar_destino2(int ifurg, int iest) {
+    return furgonetas[ifurg][DESTINO1] != -1 && furgonetas[ifurg][DESTINO1] != iest;
+  }
+
+  public boolean puede_swap_d1(int i, int j) {
+    return furgonetas[i][DESTINO1] != -1 && furgonetas[j][DESTINO1] != -1;
+  }
+
+
+  //Swaps destinos 1
+  public void swap_d1(int i, int j) {
+    int tmp = furgonetas[i][DESTINO1];
+    furgonetas[i][DESTINO1] = furgonetas[j][DESTINO1];
+    furgonetas[j][DESTINO1] = tmp;
+  }
+  
+  public boolean puede_swap_d2(int i, int j) {
+    return furgonetas[i][DESTINO2] != -1 && furgonetas[j][DESTINO2] != -1;
+  }
+
+  //Swaps destinos 2
+  public void swap_d2(int i, int j) {
+    int tmp = furgonetas[i][DESTINO2];
+    furgonetas[i][DESTINO2] = furgonetas[j][DESTINO2];
+    furgonetas[j][DESTINO2] = tmp;
+  }
+  
+  public boolean puede_swap_d12(int i, int j) {
+    return furgonetas[i][DESTINO1] != -1 && furgonetas[j][DESTINO2] != -1;
   }
   
 
-  //Calidad de la solución + heurísticas
+  //Swap destinos 1 con destinos 2 (no sirve ?)
+  public void swap_d12(int i, int j) {
+    int tmp = furgonetas[i][DESTINO1];
+    furgonetas[i][DESTINO1] = furgonetas[j][DESTINO2];
+    furgonetas[j][DESTINO2] = tmp;
+  }
+  
+  public boolean puede_swap_d21(int i, int j) {
+    return furgonetas[i][DESTINO2] != -1 && furgonetas[j][DESTINO1] != -1;
+  }
+  
+
+  //Swap destinos 2 con destinos 1 (no sirve ?)
+  public void swap_d21(int i, int j) {
+    int tmp = furgonetas[i][DESTINO2];
+    furgonetas[i][DESTINO2] = furgonetas[j][DESTINO1];
+    furgonetas[j][DESTINO1] = tmp;
+  }
+
+
+
+  //--------------CALIDAD DE LA SOLUCION------------------------ 
 
   public double getBeneficio() {
     double bnf = 0.0;
@@ -264,10 +331,10 @@ public class BicingBoard {
     
     for (int i = 0; i < furgonetas.length; ++i) {
       if (furgonetas[i][ORIGEN] != -1 && furgonetas[i][DESTINO1] != -1) {
-        bicis_q[furgonetas[i][ORIGEN]] -= (furgonetas[i][BICIS1] + furgonetas[i][BICIS2]);
+        bicis_q[furgonetas[i][ORIGEN]] += (furgonetas[i][BICIS1] + furgonetas[i][BICIS2]);
         bicis_t[furgonetas[i][DESTINO1]] += furgonetas[i][BICIS1];
         if (furgonetas[i][DESTINO2] != -1) bicis_t[furgonetas[i][DESTINO2]] += furgonetas[i][BICIS2];
-
+        
         //El coste del transporte
         int x_orig = estaciones.get(furgonetas[i][ORIGEN]).getCoordX();
         int y_orig = estaciones.get(furgonetas[i][ORIGEN]).getCoordY();
@@ -276,14 +343,14 @@ public class BicingBoard {
         int y_d1 = estaciones.get(furgonetas[i][DESTINO1]).getCoordY();
       
         int recorrido1 = dist(x_orig, y_orig, x_d1, y_d1);
-        //bnf -= ((double) (furgonetas[i][BICIS1] + furgonetas[i][BICIS2] + 9) / 10)*recorrido1/1000; 
+        bnf -= ((double) (furgonetas[i][BICIS1] + furgonetas[i][BICIS2] + 9) / 10)*recorrido1/1000; 
       
 
         if (furgonetas[i][DESTINO2] != -1) {
           int x_d2 = estaciones.get(furgonetas[i][DESTINO1]).getCoordX();
           int y_d2 = estaciones.get(furgonetas[i][DESTINO2]).getCoordY();
           int recorrido2 = dist(x_d1, y_d1, x_d2, y_d2);
-          //bnf -= ((double) (furgonetas[i][BICIS2] + 9) / 10)*recorrido2/1000; 
+          bnf -= ((double) (furgonetas[i][BICIS2] + 9) / 10)*recorrido2/1000; 
         }
       }
     }
@@ -291,18 +358,18 @@ public class BicingBoard {
     //Ahora los gastos/beneficio por alejarme/acercarme a la demanda.
     for (int i = 0; i < estaciones.size(); ++i) {
       //Beneficio
-      if (estaciones.get(i).getDemanda() - (estaciones.get(i).getNumBicicletasNext() + bicis_t[i]) <= 0) 
-        bnf += Math.max(0, estaciones.get(i).getDemanda() - estaciones.get(i).getNumBicicletasNext());
-      else bnf += bicis_t[i];
+      bnf += Math.min(bicis_t[i], Math.max(0, estaciones.get(i).getDemanda() - estaciones.get(i).getNumBicicletasNext()));
 
       //Coste
-      
-      if (estaciones.get(i).getDemanda() - (estaciones.get(i).getNumBicicletasNext() - bicis_q[i]) > 0)
+      if ((estaciones.get(i).getDemanda() - (estaciones.get(i).getNumBicicletasNext() - bicis_q[i])) > 0)
         bnf -= (bicis_q[i] - Math.max(0, estaciones.get(i).getNumBicicletasNext() - estaciones.get(i).getDemanda()));
     }
     return bnf;
   }
 
+  //--------------------HEURISTICAS-----------------
+
+  //Heuristica 1:
   public double getPrecio1() {
     double bnf = 0.0;
     int[] bicis_t = new int[estaciones.size()];
@@ -311,7 +378,7 @@ public class BicingBoard {
     
     for (int i = 0; i < furgonetas.length; ++i) {
       if (furgonetas[i][ORIGEN] != -1 && furgonetas[i][DESTINO1] != -1) {
-        bicis_q[furgonetas[i][ORIGEN]] -= (furgonetas[i][BICIS1] + furgonetas[i][BICIS2]);
+        bicis_q[furgonetas[i][ORIGEN]] += (furgonetas[i][BICIS1] + furgonetas[i][BICIS2]);
         bicis_t[furgonetas[i][DESTINO1]] += furgonetas[i][BICIS1];
         if (furgonetas[i][DESTINO2] != -1) bicis_t[furgonetas[i][DESTINO2]] += furgonetas[i][BICIS2];
       }
@@ -320,28 +387,57 @@ public class BicingBoard {
     //Ahora los gastos/beneficio por alejarme/acercarme a la demanda.
     for (int i = 0; i < estaciones.size(); ++i) {
       //Beneficio
-      if (estaciones.get(i).getDemanda() - (estaciones.get(i).getNumBicicletasNext() + bicis_t[i]) <= 0) 
-        bnf += Math.max(0, estaciones.get(i).getDemanda() - estaciones.get(i).getNumBicicletasNext());
-      else bnf += bicis_t[i];
+      bnf += Math.min(bicis_t[i], Math.max(0, estaciones.get(i).getDemanda() - estaciones.get(i).getNumBicicletasNext()));
 
       //Coste
-      if (estaciones.get(i).getDemanda() - (estaciones.get(i).getNumBicicletasNext() - bicis_q[i]) > 0)
+      if ((estaciones.get(i).getDemanda() - (estaciones.get(i).getNumBicicletasNext() - bicis_q[i])) > 0)
         bnf -= (bicis_q[i] - Math.max(0, estaciones.get(i).getNumBicicletasNext() - estaciones.get(i).getDemanda()));
     }
     return -bnf;
   }
+
+  //Heuristica 2:
   public double getPrecio2() {
     return -getBeneficio();
   }
 
-  //Getters
+
+
+  public double getCosteTransporte() {
+    double coste = 0.0;
+    for (int i = 0; i < furgonetas.length; ++i) {
+      if (furgonetas[i][ORIGEN] != -1 && furgonetas[i][DESTINO1] != -1) {
+        //El coste del transporte
+        int x_orig = estaciones.get(furgonetas[i][ORIGEN]).getCoordX();
+        int y_orig = estaciones.get(furgonetas[i][ORIGEN]).getCoordY();
+      
+        int x_d1 = estaciones.get(furgonetas[i][DESTINO1]).getCoordX();
+        int y_d1 = estaciones.get(furgonetas[i][DESTINO1]).getCoordY();
+      
+        int recorrido1 = dist(x_orig, y_orig, x_d1, y_d1);
+        coste += ((double) (furgonetas[i][BICIS1] + furgonetas[i][BICIS2] + 9) / 10)*recorrido1/1000; 
+      
+        if (furgonetas[i][DESTINO2] != -1) {
+          int x_d2 = estaciones.get(furgonetas[i][DESTINO1]).getCoordX();
+          int y_d2 = estaciones.get(furgonetas[i][DESTINO2]).getCoordY();
+          int recorrido2 = dist(x_d1, y_d1, x_d2, y_d2);
+          coste += ((double) (furgonetas[i][BICIS2] + 9) / 10)*recorrido2/1000; 
+        }
+      }
+    }
+    return coste;
+  }
+
+
+  //---------------GETTERS-----------------
+
   public int[][] getFurgonetas() {
     return furgonetas;
   }
-  public int[] getLibres() {
-    return furgosLibres;
-  }
 
+  public boolean[] getOrigenesOcupados() {
+    return origenOcupado;
+  }
 
   public int getNumFurgos() {
     return furgonetas.length;
@@ -351,42 +447,22 @@ public class BicingBoard {
     return estaciones.size();
   }
 
-  public int getDestino1(int ifurg) {
-    return furgonetas[ifurg][DESTINO1];
+
+  public int getMaxBicis(int iest) {
+    int num = Math.min(estaciones.get(iest).getNumBicicletasNoUsadas(), estaciones.get(iest).getNumBicicletasNext() - estaciones.get(iest).getDemanda());
+
+    if (num > 30) return 30;
+    else return num;
   }
 
-  public int getDestino2(int ifurg) {
-    return furgonetas[ifurg][DESTINO2];
+  public int getBicisNecesitadas(int iest) {
+    return estaciones.get(iest).getDemanda() - estaciones.get(iest).getNumBicicletasNext();
   }
-
-  public int getOrigen(int ifurg) {
-    return furgonetas[ifurg][ORIGEN];
-  }
-
-  public boolean validChoice(int ifurg, int iest) {
-    return furgonetas[ifurg][ORIGEN] != iest && furgonetas[ifurg][DESTINO1] != iest && furgonetas[ifurg][DESTINO2] != iest;
-  }
-
-  public Estaciones getEstaciones() {
-    return estaciones;
-  }
-
-  public final int getBicisDestino1(int ifurg) {
-    return furgonetas[ifurg][BICIS1];
-  }
-
-  public final int getBicisDestino2(int ifurg) {
-    return furgonetas[ifurg][BICIS2];
-  }
-
-  public int getSinUsar(int ifurg) {
-    return furgosLibres[ifurg];
-  }
-
-
+  // --------------------------------------------
   
 
   private static int dist(int x1, int y1, int x2, int y2) {
     return Math.abs(x2 - x1) + Math.abs(y2 - y1);
   }
-};
+
+}
