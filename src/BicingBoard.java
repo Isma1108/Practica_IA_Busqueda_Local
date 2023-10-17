@@ -249,22 +249,11 @@ public class BicingBoard {
         furgonetas[ifurg][BICIS2] = 0;
       }
 
-      // switch 
-      else if (furgonetas[ifurg][DESTINO1] == iest) {
+      else {
+        
+        if (furgonetas[ifurg][DESTINO1] == iest) furgonetas[ifurg][DESTINO1] = furgonetas[ifurg][ORIGEN];
+        else if (furgonetas[ifurg][DESTINO2] == iest) furgonetas[ifurg][DESTINO2] = furgonetas[ifurg][ORIGEN];
 
-          furgonetas[ifurg][DESTINO1] = furgonetas[ifurg][ORIGEN];
-          origenOcupado[furgonetas[ifurg][ORIGEN]] = false;
-          origenOcupado[iest] = true;
-
-          furgonetas[ifurg][BICIS1] = Math.max(0, getMaxBicis(furgonetas[ifurg][ORIGEN]));
-          int bicis_d1 = Math.max(0, furgonetas[ifurg][BICIS1] - getBicisNecesitadas(furgonetas[ifurg][DESTINO1]));
-          if (furgonetas[ifurg][DESTINO2] != -1) {
-            furgonetas[ifurg][BICIS2] = bicis_d1;
-            furgonetas[ifurg][BICIS1] -= bicis_d1;
-          }
-      }
-
-      else {        
         origenOcupado[furgonetas[ifurg][ORIGEN]] = false;
         origenOcupado[iest] = true;
         furgonetas[ifurg][ORIGEN] = iest;
