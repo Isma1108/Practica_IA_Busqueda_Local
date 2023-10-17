@@ -45,8 +45,10 @@ public class BicingSuccessorFunction implements SuccessorFunction {
       for (int j = 0; j < board.getNumEstaciones(); ++j) {
         BicingBoard newBoard = new BicingBoard(board.getOrigenesOcupados(), board.getFurgonetas()); //Copia
 
-        newBoard.cambiar_origen(i,j);
-        retVal.add(new Successor("", newBoard));
+        if (newBoard.puede_cambiar_origen(i)) {
+          newBoard.cambiar_origen(i,j);
+          retVal.add(new Successor("", newBoard));
+        }
       }
     }
 

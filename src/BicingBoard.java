@@ -231,9 +231,17 @@ public class BicingBoard {
     }
   }
 
+  // No tiene sentido cambiar origen si no tiene destino o no tiene origen
+
+  public boolean puede_cambiar_origen(int ifurg) {
+    return furgonetas[ifurg][DESTINO1] != -1 && furgonetas[ifurg][ORIGEN] != -1;
+  }
+
 
   public void cambiar_origen(int ifurg, int iest) {
-      if (origenOcupado[iest] || furgonetas[ifurg][DESTINO1] == iest || furgonetas[ifurg][DESTINO2] == iest) {
+      if (origenOcupado[iest]) {
+
+        origenOcupado[furgonetas[ifurg][ORIGEN]] = false;
         furgonetas[ifurg][ORIGEN] = -1;
         furgonetas[ifurg][DESTINO1] = -1;
         furgonetas[ifurg][BICIS1] = 0;
@@ -241,16 +249,31 @@ public class BicingBoard {
         furgonetas[ifurg][BICIS2] = 0;
       }
 
-      else {
-        furgonetas[ifurg][ORIGEN] = iest;
+      // switch 
+      else if (furgonetas[ifurg][DESTINO1] == iest) {
 
-        if (furgonetas[ifurg][DESTINO1] != -1) {
+          furgonetas[ifurg][DESTINO1] = furgonetas[ifurg][ORIGEN];
+          origenOcupado[furgonetas[ifurg][ORIGEN]] = false;
+          origenOcupado[iest] = true;
+
           furgonetas[ifurg][BICIS1] = Math.max(0, getMaxBicis(furgonetas[ifurg][ORIGEN]));
           int bicis_d1 = Math.max(0, furgonetas[ifurg][BICIS1] - getBicisNecesitadas(furgonetas[ifurg][DESTINO1]));
           if (furgonetas[ifurg][DESTINO2] != -1) {
             furgonetas[ifurg][BICIS2] = bicis_d1;
             furgonetas[ifurg][BICIS1] -= bicis_d1;
           }
+      }
+
+      else {        
+        origenOcupado[furgonetas[ifurg][ORIGEN]] = false;
+        origenOcupado[iest] = true;
+        furgonetas[ifurg][ORIGEN] = iest;
+
+        furgonetas[ifurg][BICIS1] = Math.max(0, getMaxBicis(furgonetas[ifurg][ORIGEN]));
+        int bicis_d1 = Math.max(0, furgonetas[ifurg][BICIS1] - getBicisNecesitadas(furgonetas[ifurg][DESTINO1]));
+        if (furgonetas[ifurg][DESTINO2] != -1) {
+          furgonetas[ifurg][BICIS2] = bicis_d1;
+          furgonetas[ifurg][BICIS1] -= bicis_d1;
         }
       }
   }
