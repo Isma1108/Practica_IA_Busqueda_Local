@@ -267,6 +267,49 @@ public class BicingBoard {
       }
   }
 
+  /*
+
+  public void cambia_bicis_destino (int ifurg) {
+    if (furgonetas[ifurg][BICIS1] >= 2) {
+      furgonetas[ifurg][BICIS1] -= 1;
+      furgonetas[ifurg][BICIS2] += 1;  
+    }
+    else if (furgonetas[ifurg][BICIS1] == 1) {
+      furgonetas[ifurg][DESTINO1] = furgonetas[ifurg][DESTINO2];
+      furgonetas[ifurg][BICIS1] = furgonetas[ifurg][BICIS2] + 1; 
+
+      furgonetas[ifurg][DESTINO2] = -1;
+      furgonetas[ifurg][BICIS2] = 0;
+    }
+  }
+
+  public boolean puede_cambiar_bicis(int ifurg) {
+    return furgonetas[ifurg][DESTINO1] != -1 && furgonetas[ifurg][DESTINO2] != -1 && furgonetas[ifurg][BICIS1] >= 1;
+  }
+
+
+
+  public void swap_destino_propio (int ifurg) {
+
+    int d1 = furgonetas[ifurg][DESTINO1];
+    int d2 = furgonetas[ifurg][DESTINO2];
+
+    if (getBicisNecesitadas(d2) > getBicisNecesitadas(d1)) {
+      int temp = furgonetas[ifurg][BICIS1];
+        furgonetas[ifurg][BICIS1] = furgonetas[ifurg][BICIS2];
+        furgonetas[ifurg][BICIS2] = temp;
+    }
+
+    furgonetas[ifurg][DESTINO1] = d2;
+    furgonetas[ifurg][DESTINO1] = d1;
+  }
+
+  public boolean puede_swap_propio(int ifurg) {
+    return furgonetas[ifurg][DESTINO1] != -1 && furgonetas[ifurg][DESTINO2] != -1 && furgonetas[ifurg][BICIS1] >= 1;
+  }
+
+  */
+
   
   public boolean puede_cambiar_destino2(int ifurg, int iest) {
     return furgonetas[ifurg][DESTINO1] != -1 && furgonetas[ifurg][DESTINO1] != iest;
