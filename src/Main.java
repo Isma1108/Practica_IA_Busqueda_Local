@@ -155,7 +155,7 @@ public class Main {
       long time = System.currentTimeMillis();
       
       Problem problem =  new Problem(board, new BicingSuccessorFunction(), 
-          new BicingGoalTest(), new BicingHeuristicFunction2());
+      new BicingGoalTest(), new BicingHeuristicFunction2());
       Search search =  new HillClimbingSearch();
       SearchAgent agent = new SearchAgent(problem,search);
             
@@ -164,6 +164,7 @@ public class Main {
       System.out.println("Después de la búsqueda el benefico es de : " + newboard.getBeneficio());
       System.out.println("Después de la búsqueda el benefico (sin transporte) es de : " + -newboard.getPrecio1());
       System.out.println("El coste del transporte es de " + newboard.getCosteTransporte());
+      System.out.println("La distancia recorrida es " + newboard.getDistancia() + " metros");
       System.out.println("Tiempo transcurrido: " + time + " ms");
       
             System.out.println();

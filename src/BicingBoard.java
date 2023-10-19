@@ -471,6 +471,29 @@ public class BicingBoard {
     return coste;
   }
 
+  public double getDistancia() {
+    double dist = 0.0;
+    for (int i = 0; i < furgonetas.length; ++i) {
+      if (furgonetas[i][ORIGEN] != -1 && furgonetas[i][DESTINO1] != -1) {
+        //El coste del transporte
+        int x_orig = estaciones.get(furgonetas[i][ORIGEN]).getCoordX();
+        int y_orig = estaciones.get(furgonetas[i][ORIGEN]).getCoordY();
+      
+        int x_d1 = estaciones.get(furgonetas[i][DESTINO1]).getCoordX();
+        int y_d1 = estaciones.get(furgonetas[i][DESTINO1]).getCoordY();
+      
+        dist += dist(x_orig, y_orig, x_d1, y_d1);
+      
+        if (furgonetas[i][DESTINO2] != -1) {
+          int x_d2 = estaciones.get(furgonetas[i][DESTINO1]).getCoordX();
+          int y_d2 = estaciones.get(furgonetas[i][DESTINO2]).getCoordY();
+          dist += dist(x_d1, y_d1, x_d2, y_d2);
+        }
+      }
+    }
+    return dist;
+  }
+
 
   //---------------GETTERS-----------------
 
