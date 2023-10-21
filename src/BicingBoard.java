@@ -20,6 +20,7 @@ public class BicingBoard {
   private int[][] furgonetas;
 
   private boolean[] origenOcupado;
+  private int[] bicis_dejadas;
   /*
    * Si origenOcupado[i] = true significa que hay una Furgoneta que parte de
    * estacion-i hacia un destino estacion-j
@@ -40,6 +41,7 @@ public class BicingBoard {
       furgonetas[i][DESTINO2] = -1;
     }
     origenOcupado = new boolean[e.size()];
+    bicis_dejadas = new int[e.size()];
     // By default boolean is false
     // for (int i = 0; i < origenOcupado.length; i++) origenOcupado[i] = false;
   }
@@ -55,7 +57,7 @@ public class BicingBoard {
     }
   }
 
-  public BicingBoard(boolean[] orig, int[][] furgs) {
+  public BicingBoard(boolean[] orig, int[][] furgs, int[] bicis_d) {
     furgonetas = new int[furgs.length][5];
     for (int i = 0; i < furgs.length; ++i) {
       furgonetas[i][ORIGEN] = furgs[i][ORIGEN];
@@ -67,6 +69,10 @@ public class BicingBoard {
     origenOcupado = new boolean[orig.length];
     for (int i = 0; i < orig.length; ++i) {
       origenOcupado[i] = orig[i];
+    }
+    bicis_dejadas = new int[bicis_d.length];
+    for (int i = 0; i < bicis_d.length; ++i) {
+      bicis_dejadas[i] = bicis_d[i];
     }
   }
 
@@ -197,38 +203,67 @@ public class BicingBoard {
   
   //Cambirar destino 1:
   public void cambiar_destino1(int ifurg, int iest) {
-    if (furgonetas[ifurg][DESTINO1] == -1) {
-      furgonetas[ifurg][BICIS1] = Math.max(0, getMaxBicis(furgonetas[ifurg][ORIGEN]));
-    }
-    furgonetas[ifurg][DESTINO1] = iest;
-    
     if (furgonetas[ifurg][ORIGEN] == iest) {
       //La furgoneta passa a no hacer nada
+      if (furgonetas[ifurg][DESTINO1] != -1) bicis_dejadas[furgonetas[ifurg][DESTINO1]] -= furgonetas[ifurg][BICIS1];
+      if (furgonetas[ifurg][DESTINO2] != -1) bicis_dejadas[furgonetas[ifurg][DESTINO2]] -= furgonetas[ifurg][BICIS2];
       furgonetas[ifurg][DESTINO1] = -1;
       furgonetas[ifurg][DESTINO2] = -1;
       furgonetas[ifurg][BICIS1] = 0;
       furgonetas[ifurg][BICIS2] = 0;
+    }
+    else {
+      if (furgonetas[ifurg][DESTINO1] != -1) bicis_dejadas[furgonetas[ifurg][DESTINO1]] -= furgonetas[ifurg][BICIS1];
+      if (furgonetas[ifurg][DESTINO2] != -1) bicis_dejadas[furgonetas[ifurg][DESTINO2]] -= furgonetas[ifurg][BICIS2];
 
+      furgonetas[ifurg][BICIS1] = Math.max(0, getMaxBicis(furgonetas[ifurg][ORIGEN]));
+      bicis_dejadas[iest] += furgonetas[ifurg][BICIS1];
+     
+      //Recalculo las que se pueden dejar en D2 si es que existeD2
+
+      if (furgonetas[ifurg][DESTINO2] != -1) {
+          int bicis_d1 = Math.min(furgonetas[ifurg][BICIS1], bicis_dejadas[iest] - getBicisNecesitadas(furgonetas[ifurg][DESTINO1]));
+          if (bicis_d1 < 0) bicis_d1 = 0;
+          furgonetas[ifurg][BICIS2] = bicis_d1;
+          furgonetas[ifurg][BICIS1] -= bicis_d1;
+          bicis_dejadas[furgonetas[ifurg][DESTINO2]] += bicis_d1; 
+          bicis_dejadas[iest] -= bicis_d1; 
+      }
+      furgonetas[ifurg][DESTINO1] = iest;
     }
   }
 
   //Cambiar destino 2:
   public void cambiar_destino2(int ifurg, int iest) {
-    
-    if (furgonetas[ifurg][DESTINO2] == -1) {
-      //Antes no habia destino 2, ahora si
-      int bicis_d1 = Math.max(0, furgonetas[ifurg][BICIS1] - getBicisNecesitadas(furgonetas[ifurg][DESTINO1]));
-      furgonetas[ifurg][BICIS2] = bicis_d1;
-      furgonetas[ifurg][BICIS1] -= bicis_d1;
-    }
-    furgonetas[ifurg][DESTINO2] = iest;
-    
     if (furgonetas[ifurg][ORIGEN] == iest) {
       //Ahora no hay destino 2
-      furgonetas[ifurg][DESTINO2] = -1;
-      furgonetas[ifurg][BICIS1] += furgonetas[ifurg][BICIS2];
-      furgonetas[ifurg][BICIS2] = 0;
+      if (furgonetas[ifurg][DESTINO2] != -1) {
+        bicis_dejadas[furgonetas[ifurg][DESTINO1]] += furgonetas[ifurg][BICIS2];
+        bicis_dejadas[furgonetas[ifurg][DESTINO2]] -= furgonetas[ifurg][BICIS2];
+        furgonetas[ifurg][DESTINO2] = -1;
+        furgonetas[ifurg][BICIS1] += furgonetas[ifurg][BICIS2];
+        furgonetas[ifurg][BICIS2] = 0;
+      }
     }
+    else {
+      if (furgonetas[ifurg][DESTINO2] == -1) {
+        int bicis_d1 = Math.min(furgonetas[ifurg][BICIS1], bicis_dejadas[furgonetas[ifurg][DESTINO1]] - getBicisNecesitadas(furgonetas[ifurg][DESTINO1])); 
+        if (bicis_d1 < 0) bicis_d1 = 0;
+        furgonetas[ifurg][BICIS2] = bicis_d1;
+        furgonetas[ifurg][BICIS1] -= bicis_d1;
+        bicis_dejadas[iest] += bicis_d1; 
+        bicis_dejadas[furgonetas[ifurg][DESTINO1]] -= bicis_d1; 
+      }
+      else {
+        bicis_dejadas[furgonetas[ifurg][DESTINO2]] -= furgonetas[ifurg][BICIS2]; 
+        bicis_dejadas[iest] += furgonetas[ifurg][BICIS2];
+      }
+    }
+    furgonetas[ifurg][DESTINO2] = iest;
+  }
+  
+  public boolean puede_cambiar_destino2(int ifurg, int iest) {
+    return furgonetas[ifurg][DESTINO1] != -1 && furgonetas[ifurg][DESTINO1] != iest;
   }
 
   // No tiene sentido cambiar origen si no tiene destino o no tiene origen
@@ -240,7 +275,6 @@ public class BicingBoard {
 
   public void cambiar_origen(int ifurg, int iest) {
       if (origenOcupado[iest]) {
-
         origenOcupado[furgonetas[ifurg][ORIGEN]] = false;
         furgonetas[ifurg][ORIGEN] = -1;
         furgonetas[ifurg][DESTINO1] = -1;
@@ -250,7 +284,6 @@ public class BicingBoard {
       }
 
       else {
-        
         if (furgonetas[ifurg][DESTINO1] == iest) furgonetas[ifurg][DESTINO1] = furgonetas[ifurg][ORIGEN];
         else if (furgonetas[ifurg][DESTINO2] == iest) furgonetas[ifurg][DESTINO2] = furgonetas[ifurg][ORIGEN];
 
@@ -268,9 +301,6 @@ public class BicingBoard {
   }
 
   
-  public boolean puede_cambiar_destino2(int ifurg, int iest) {
-    return furgonetas[ifurg][DESTINO1] != -1 && furgonetas[ifurg][DESTINO1] != iest;
-  }
 
   public boolean puede_swap_d1(int i, int j) {
     return furgonetas[i][DESTINO1] != -1 && furgonetas[j][DESTINO1] != -1;
@@ -437,6 +467,10 @@ public class BicingBoard {
 
   public boolean[] getOrigenesOcupados() {
     return origenOcupado;
+  }
+  
+  public int[] getBicisDejadas() {
+    return bicis_dejadas;
   }
 
   public int getNumFurgos() {

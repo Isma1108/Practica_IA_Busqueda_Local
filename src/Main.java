@@ -114,6 +114,7 @@ public class Main {
       System.out.println("El coste del transporte es de " + newboard.getCosteTransporte());
       System.out.println("Tiempo transcurrido: " + time + " ms");
 
+      printActions(agent.getActions());
       printInstrumentation(agent.getInstrumentation());
     } 
     catch (Exception e) {
@@ -137,6 +138,7 @@ public class Main {
       System.out.println("Después de la búsqueda el benefico (sin transporte) es de : " + -newboard.getPrecio1());
       System.out.println("El coste del transporte es de " + newboard.getCosteTransporte());
       System.out.println("Tiempo transcurrido: " + time + " ms");
+      printActions(agent.getActions());
       printInstrumentation(agent.getInstrumentation());
     } 
     catch (Exception e) {
@@ -161,6 +163,7 @@ public class Main {
       System.out.println("El coste del transporte es de " + newboard.getCosteTransporte());
       System.out.println("Tiempo transcurrido: " + time + " ms");
       
+      printActions(agent.getActions());
       printInstrumentation(agent.getInstrumentation());
     } 
     catch (Exception e) {
@@ -184,6 +187,7 @@ public class Main {
       System.out.println("Después de la búsqueda el benefico (sin transporte) es de : " + -newboard.getPrecio1());
       System.out.println("El coste del transporte es de " + newboard.getCosteTransporte());
       System.out.println("Tiempo transcurrido: " + time + " ms");
+      printActions(agent.getActions());
       printInstrumentation(agent.getInstrumentation());
     } 
     catch (Exception e) {
@@ -197,5 +201,11 @@ public class Main {
       String property = properties.getProperty(key);
       System.out.println(key + " : " + property);
     }
+  }
+  private static void printActions(List actions) {
+        for (int i = 0; i < actions.size(); i++) {
+            String action = (String) actions.get(i);
+            System.out.println(action);
+        }
   }
 }
