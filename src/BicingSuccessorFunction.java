@@ -39,14 +39,13 @@ public class BicingSuccessorFunction implements SuccessorFunction {
 
     
     
-    /*
     //Cambiar origen
 
     for (int i = 0; i < board.getNumFurgos(); ++i) {
       for (int j = 0; j < board.getNumEstaciones(); ++j) {
-        BicingBoard newBoard = new BicingBoard(board.getOrigenesOcupados(), board.getFurgonetas()); //Copia
+        BicingBoard newBoard = new BicingBoard(board.getOrigenesOcupados(), board.getFurgonetas(), board.getBicisDejadas()); //Copia
 
-        if (newBoard.puede_cambiar_origen(i)) {
+        if (newBoard.puede_cambiar_origen(i, j)) {
           newBoard.cambiar_origen(i,j);
           retVal.add(new Successor("cambio origen", newBoard));
         }
@@ -54,7 +53,6 @@ public class BicingSuccessorFunction implements SuccessorFunction {
     }
 
     
-   */ 
     //Swap destins
     for (int i = 0; i < board.getNumFurgos(); ++i) {
       for (int j = 0; j < board.getNumFurgos(); ++j) {

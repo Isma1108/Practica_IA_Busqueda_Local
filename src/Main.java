@@ -112,6 +112,7 @@ public class Main {
       System.out.println("Después de la búsqueda el benefico es de : " + newboard.getBeneficio());
       System.out.println("Después de la búsqueda el benefico (sin transporte) es de : " + -newboard.getPrecio1());
       System.out.println("El coste del transporte es de " + newboard.getCosteTransporte());
+      System.out.println("La distancia recorrida es de " + newboard.getDistancia());
       System.out.println("Tiempo transcurrido: " + time + " ms");
 
       printActions(agent.getActions());
@@ -137,6 +138,7 @@ public class Main {
       System.out.println("Después de la búsqueda el benefico es de : " + newboard.getBeneficio());
       System.out.println("Después de la búsqueda el benefico (sin transporte) es de : " + -newboard.getPrecio1());
       System.out.println("El coste del transporte es de " + newboard.getCosteTransporte());
+      System.out.println("La distancia recorrida es de " + newboard.getDistancia());
       System.out.println("Tiempo transcurrido: " + time + " ms");
       printActions(agent.getActions());
       printInstrumentation(agent.getInstrumentation());
@@ -161,6 +163,7 @@ public class Main {
       System.out.println("Después de la búsqueda el benefico es de : " + newboard.getBeneficio());
       System.out.println("Después de la búsqueda el benefico (sin transporte) es de : " + -newboard.getPrecio1());
       System.out.println("El coste del transporte es de " + newboard.getCosteTransporte());
+      System.out.println("La distancia recorrida es de " + newboard.getDistancia());
       System.out.println("Tiempo transcurrido: " + time + " ms");
       
       printActions(agent.getActions());
@@ -186,6 +189,7 @@ public class Main {
       System.out.println("Después de la búsqueda el benefico es de : " + newboard.getBeneficio());
       System.out.println("Después de la búsqueda el benefico (sin transporte) es de : " + -newboard.getPrecio1());
       System.out.println("El coste del transporte es de " + newboard.getCosteTransporte());
+      System.out.println("La distancia recorrida es de " + newboard.getDistancia());
       System.out.println("Tiempo transcurrido: " + time + " ms");
       printActions(agent.getActions());
       printInstrumentation(agent.getInstrumentation());
