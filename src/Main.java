@@ -111,7 +111,8 @@ public class Main {
       BicingBoard newboard = (BicingBoard) search.getGoalState(); 
       System.out.println("Después de la búsqueda el benefico es de : " + newboard.getBeneficio());
       System.out.println("Después de la búsqueda el benefico (sin transporte) es de : " + -newboard.getPrecio1());
-      System.out.println("El coste del transporte es de " + newboard.getCosteTransporte());
+      System.out.println("La distancia recorrida es " + newboard.getDistancia() + " metros");
+      // System.out.println("El coste del transporte es de " + newboard.getCosteTransporte());
       System.out.println("Tiempo transcurrido: " + time + " ms");
 
       System.out.println();
