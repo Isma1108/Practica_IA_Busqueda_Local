@@ -196,6 +196,7 @@ public class BicingBoard {
       furgonetas[i][ORIGEN] = i;
       furgonetas[i][DESTINO1] = estaciones.size() - 1 - i;
       furgonetas[i][BICIS1] = Math.max(0, getMaxBicis(furgonetas[i][ORIGEN]));
+      bicis_dejadas[furgonetas[i][DESTINO1]] += furgonetas[i][BICIS1];
     }
   }
 
@@ -302,9 +303,15 @@ public class BicingBoard {
 
   //Swap destinos 1 con destinos 2 (no sirve ?)
   public void swap_d12(int i, int j) {
+    clean_bicis_dejadas(i);
+    clean_bicis_dejadas(j);
+    
     int tmp = furgonetas[i][DESTINO1];
     furgonetas[i][DESTINO1] = furgonetas[j][DESTINO2];
     furgonetas[j][DESTINO2] = tmp;
+    
+    update_bicis_dejadas(i);
+    update_bicis_dejadas(j);
   }
   
   public boolean puede_swap_d21(int i, int j) {
@@ -314,11 +321,28 @@ public class BicingBoard {
 
   //Swap destinos 2 con destinos 1 (no sirve ?)
   public void swap_d21(int i, int j) {
+    clean_bicis_dejadas(i);
+    clean_bicis_dejadas(j);
+    
     int tmp = furgonetas[i][DESTINO2];
     furgonetas[i][DESTINO2] = furgonetas[j][DESTINO1];
     furgonetas[j][DESTINO1] = tmp;
+    
+    update_bicis_dejadas(i);
+    update_bicis_dejadas(j);
   }
 
+  public boolean puede_furgo_swap(int ifurg) {
+    return furgonetas[ifurg][DESTINO1] != -1 && furgonetas[ifurg][DESTINO2] != -1;
+  }
+
+  public void swap_furgo(int ifurg) {
+    clean_bicis_dejadas(ifurg);
+    int tmp = furgonetas[ifurg][DESTINO1];
+    furgonetas[ifurg][DESTINO1] = furgonetas[ifurg][DESTINO2];
+    furgonetas[ifurg][DESTINO2] = tmp;
+    update_bicis_dejadas(ifurg);
+  }
 
   //Update de las bicis dejadas en D1 y D2, de forma que se dejen todo lo que se 
   //pueda y se necesite en el D1, y lo que sobre en el D2
