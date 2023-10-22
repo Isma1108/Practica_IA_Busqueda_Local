@@ -83,6 +83,7 @@ public class BicingBoard {
 
   // Trivial (voraz):
   public void generar_solucion_trivial() {
+    /*
     Collections.sort(estaciones, new Comparator<Estacion>() {
       public int compare (Estacion a, Estacion b) {
 
@@ -93,8 +94,10 @@ public class BicingBoard {
       }
     });
     
-    for (int i = 0; i < furgonetas.length; i++)
+    */
+    for (int i = 0; i < furgonetas.length; i++) {
       furgonetas[i][ORIGEN] = i;
+    }
   }
   
 
@@ -110,58 +113,28 @@ public class BicingBoard {
       furgonetas[i][ORIGEN] = temp;
     }
     for (int i = 0; i < furgonetas.length; i++) {
-      destinoGreedyRandom(furgonetas[i], random);
+      destinoFullRandom(furgonetas[i], random);
+      update_bicis_dejadas(i);
     }
   }
 
   private void destinoFullRandom(int[] furgoneta, Random random) {
     if (estaciones.size() <= 1) return; // Caso base: 1 o menos estaciones, la mejor opcion es no hacer nada
     // -1: no va a ninguna estacion
-    furgoneta[DESTINO1] = -random.nextInt(0, 2);
+    //furgoneta[DESTINO1] = -random.nextInt(0, 2);
+    furgoneta[DESTINO1] = 0;
     if (furgoneta[DESTINO1] != -1) {
       do furgoneta[DESTINO1] = random.nextInt(0, estaciones.size());
       while (furgoneta[DESTINO1] == furgoneta[ORIGEN] && estaciones.size() > 1);
 
-      int bicisNoUsadas = estaciones.get(furgoneta[ORIGEN]).getNumBicicletasNoUsadas();
-
-      furgoneta[BICIS1] = random.nextInt(0, Math.min(30, bicisNoUsadas) + 1);
-      bicisNoUsadas = bicisNoUsadas - furgoneta[BICIS1];
-
-      furgoneta[DESTINO2] = -random.nextInt(0, 1);
-      if (furgoneta[DESTINO2] != -1 && estaciones.size() > 1) {
-        do furgoneta[DESTINO2] = random.nextInt(0, estaciones.size());
-        while (furgoneta[DESTINO2] == furgoneta[ORIGEN] && furgoneta[DESTINO2] == furgoneta[DESTINO1]);
-        furgoneta[BICIS2] = random.nextInt(0, Math.min(30, bicisNoUsadas) + 1);
-      
-      }
-    }
-  }
-
-  private void destinoGreedyRandom(int[] furgoneta, Random random) {
-    furgoneta[DESTINO1] = -random.nextInt(0, 2);
-    if (furgoneta[DESTINO1] != -1 && estaciones.size() > 1) {
-      do furgoneta[DESTINO1] = random.nextInt(0, estaciones.size());
-      while (furgoneta[DESTINO1] == furgoneta[ORIGEN] && estaciones.size() > 1);
-
-      int bicisNoUsadas = estaciones.get(furgoneta[ORIGEN]).getNumBicicletasNoUsadas();
-      int bicisSigHora = estaciones.get(furgoneta[ORIGEN]).getNumBicicletasNext();
-      int demanda = estaciones.get(furgoneta[ORIGEN]).getDemanda();
-      int diff = bicisNoUsadas + bicisSigHora - demanda;
-
-      furgoneta[BICIS1] = random.nextInt(0, Math.max(0,Math.min(bicisNoUsadas, diff)) + 1);
-      bicisNoUsadas = bicisNoUsadas - furgoneta[BICIS1];
-      diff = diff - furgoneta[BICIS1];
-
-      furgoneta[DESTINO2] = -random.nextInt(0, 1);
+      //furgoneta[DESTINO2] = -random.nextInt(0, 2);
+      furgoneta[DESTINO2] = 0;
       if (furgoneta[DESTINO2] != -1 && estaciones.size() > 2) {
         do furgoneta[DESTINO2] = random.nextInt(0, estaciones.size());
         while (furgoneta[DESTINO2] == furgoneta[ORIGEN] && furgoneta[DESTINO2] == furgoneta[DESTINO1]);
-        furgoneta[BICIS2] = random.nextInt(0, Math.max(0,Math.min(bicisNoUsadas, diff)) + 1);
-
       }
     }
   }
-
 
   //Voraz 1 (ordenar en base la demanda)
   public void generar_solucion_voraz1() {
@@ -192,11 +165,14 @@ public class BicingBoard {
       }
     });
 
+    Random rand = new Random();
+    //rand.setSeed(1234);
     for (int i = 0; i < furgonetas.length; ++i) {
       furgonetas[i][ORIGEN] = i;
-      furgonetas[i][DESTINO1] = estaciones.size() - 1 - i;
-      furgonetas[i][BICIS1] = Math.max(0, getMaxBicis(furgonetas[i][ORIGEN]));
-      bicis_dejadas[furgonetas[i][DESTINO1]] += furgonetas[i][BICIS1];
+      origenOcupado[i] = true;
+      //furgonetas[i][DESTINO1] = estaciones.size() - 1 - i;
+      destinoFullRandom(furgonetas[i], rand);
+      update_bicis_dejadas(i);
     }
   }
 
@@ -212,6 +188,7 @@ public class BicingBoard {
       furgonetas[ifurg][DESTINO2] = -1;
       furgonetas[ifurg][BICIS1] = 0;
       furgonetas[ifurg][BICIS2] = 0;
+      origenOcupado[furgonetas[ifurg][ORIGEN]] = false;
     }
     else {
       clean_bicis_dejadas(ifurg);
@@ -344,12 +321,16 @@ public class BicingBoard {
     update_bicis_dejadas(ifurg);
   }
 
+
+  //-------------------------------------
   //Update de las bicis dejadas en D1 y D2, de forma que se dejen todo lo que se 
   //pueda y se necesite en el D1, y lo que sobre en el D2
 
   public void update_bicis_dejadas(int ifurg) {
-      furgonetas[ifurg][BICIS1] = Math.max(0, getMaxBicis(furgonetas[ifurg][ORIGEN]));
-      bicis_dejadas[furgonetas[ifurg][DESTINO1]] += furgonetas[ifurg][BICIS1];
+      if (furgonetas[ifurg][DESTINO1] != -1) {
+        furgonetas[ifurg][BICIS1] = Math.max(0, getMaxBicis(furgonetas[ifurg][ORIGEN]));
+        bicis_dejadas[furgonetas[ifurg][DESTINO1]] += furgonetas[ifurg][BICIS1];
+      }
      
       //Recalculo las que se pueden dejar en D2 si es que existeD2
 

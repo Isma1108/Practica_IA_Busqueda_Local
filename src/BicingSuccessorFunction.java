@@ -50,6 +50,7 @@ public class BicingSuccessorFunction implements SuccessorFunction {
     }
 
     
+    /*
     //Swap destins
     for (int i = 0; i < board.getNumFurgos(); ++i) {
       for (int j = 0; j < board.getNumFurgos(); ++j) {
@@ -96,6 +97,7 @@ public class BicingSuccessorFunction implements SuccessorFunction {
         }
       }
     }
+    */
 
     
     return retVal;

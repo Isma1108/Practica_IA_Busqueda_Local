@@ -44,8 +44,12 @@ public class Main {
     dem = sc.nextInt();
     dem = (dem == 2) ? Estaciones.RUSH_HOUR : Estaciones.EQUILIBRIUM;
     
-    System.out.print("Indica la seed: ");
+    System.out.print("Indica la seed {-1: seed aleatoria}: ");
     seed = sc.nextInt();
+    if (seed == -1) {
+      Random rand = new Random();
+      seed = rand.nextInt();
+    }
 
     System.out.print("Selecciona el estado inicial {1: Trivial, 2: Random, 3: Voraz1, 4: Voraz2}: ");
     solucion = sc.nextInt();
