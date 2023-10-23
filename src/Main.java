@@ -48,7 +48,7 @@ public class Main {
     seed = sc.nextInt();
     if (seed == -1) {
       Random rand = new Random();
-      seed = rand.nextInt();
+      seed = rand.nextInt(0, 100000);
     }
 
     System.out.print("Selecciona el estado inicial {1: Trivial, 2: Random, 3: Voraz1, 4: Voraz2}: ");
@@ -88,6 +88,7 @@ public class Main {
     System.out.println();
     System.out.println("Antes de la búsqueda el benefico es de : " + board.getBeneficio());
     System.out.println("Antes de la búsqueda el benefico (sin transporte) es de : " + -board.getPrecio1());
+    System.out.println("La seed es " + seed);
     System.out.println();
 
 
@@ -134,7 +135,8 @@ public class Main {
       
       Problem problem =  new Problem(board, new BicingSuccessorFunctionSA(), 
           new BicingGoalTest(), new BicingHeuristicFunction());
-      SimulatedAnnealingSearch search =  new SimulatedAnnealingSearch(2000,100,5,0.001); //Parametros del SA
+      SimulatedAnnealingSearch search =  new SimulatedAnnealingSearch(10000,100,125,0.0001); //Parametros del SA
+      //iteraciones totales, num it para cada cambio de temp, 
       SearchAgent agent = new SearchAgent(problem,search);
             
       time = System.currentTimeMillis() - time;
@@ -144,7 +146,7 @@ public class Main {
       System.out.println("El coste del transporte es de " + newboard.getCosteTransporte());
       System.out.println("La distancia recorrida es de " + newboard.getDistancia());
       System.out.println("Tiempo transcurrido: " + time + " ms");
-      printActions(agent.getActions());
+      //printActions(agent.getActions());
       printInstrumentation(agent.getInstrumentation());
     } 
     catch (Exception e) {
@@ -185,8 +187,9 @@ public class Main {
       
       Problem problem =  new Problem(board, new BicingSuccessorFunctionSA(), 
           new BicingGoalTest(), new BicingHeuristicFunction2());
-      SimulatedAnnealingSearch search =  new SimulatedAnnealingSearch(2000,100,5,0.001); //Parametros del SA
+      SimulatedAnnealingSearch search =  new SimulatedAnnealingSearch(10000,100,125,0.001); //Parametros del SA
       SearchAgent agent = new SearchAgent(problem,search);
+      //2000 100 5 0.001
             
       time = System.currentTimeMillis() - time;
       BicingBoard newboard = (BicingBoard) search.getGoalState(); 
@@ -195,7 +198,7 @@ public class Main {
       System.out.println("El coste del transporte es de " + newboard.getCosteTransporte());
       System.out.println("La distancia recorrida es de " + newboard.getDistancia());
       System.out.println("Tiempo transcurrido: " + time + " ms");
-      printActions(agent.getActions());
+      //printActions(agent.getActions());
       printInstrumentation(agent.getInstrumentation());
     } 
     catch (Exception e) {

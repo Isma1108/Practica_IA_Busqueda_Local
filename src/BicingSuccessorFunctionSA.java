@@ -20,21 +20,36 @@ public class BicingSuccessorFunctionSA implements SuccessorFunction {
 
     i = myRandom.nextInt(board.getNumFurgos());
     j = myRandom.nextInt(board.getNumEstaciones());
-
-    num = myRandom.nextInt(0, 2);
+    num = myRandom.nextInt(0, 3);
 
     if (num == 0) {
-      BicingBoard newBoard = new BicingBoard(board.getFurgonetas());
+      BicingBoard newBoard = new BicingBoard(board.getOrigenesOcupados(), board.getFurgonetas(), board.getBicisDejadas());
       newBoard.cambiar_destino1(i,j);
       retVal.add(new Successor("", newBoard));
     }
-    else {
-      BicingBoard newBoard = new BicingBoard(board.getFurgonetas());
-      while (!newBoard.puede_cambiar_destino2(i,j)) {
+    else if (num == 1) {
+      int it = 0;
+      BicingBoard newBoard = new BicingBoard(board.getOrigenesOcupados(), board.getFurgonetas(), board.getBicisDejadas());
+      while (!newBoard.puede_cambiar_destino2(i,j) && it < 50) {
         i = myRandom.nextInt(board.getNumFurgos());
         j = myRandom.nextInt(board.getNumEstaciones());
+        ++it;
       }
-      newBoard.cambiar_destino2(i,j);
+      if (it == 50) newBoard.cambiar_destino1(i,j);
+      else newBoard.cambiar_destino2(i,j);
+      retVal.add(new Successor("", newBoard));
+    }
+    
+    else {
+      BicingBoard newBoard = new BicingBoard(board.getOrigenesOcupados(), board.getFurgonetas(), board.getBicisDejadas());
+      int it = 0;
+      while (!newBoard.puede_cambiar_origen(i, j) && it < 50) {
+        i = myRandom.nextInt(board.getNumFurgos());
+        j = myRandom.nextInt(board.getNumEstaciones());
+        ++it;
+      }
+      if (it == 50) newBoard.cambiar_destino1(i,j);
+      else newBoard.cambiar_origen(i,j);
       retVal.add(new Successor("", newBoard));
     }
 

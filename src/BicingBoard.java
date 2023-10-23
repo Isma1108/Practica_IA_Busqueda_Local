@@ -170,8 +170,8 @@ public class BicingBoard {
     for (int i = 0; i < furgonetas.length; ++i) {
       furgonetas[i][ORIGEN] = i;
       origenOcupado[i] = true;
-      //furgonetas[i][DESTINO1] = estaciones.size() - 1 - i;
-      destinoFullRandom(furgonetas[i], rand);
+      furgonetas[i][DESTINO1] = estaciones.size() - 1 - i;
+      //destinoFullRandom(furgonetas[i], rand);
       update_bicis_dejadas(i);
     }
   }
