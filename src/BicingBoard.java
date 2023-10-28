@@ -188,6 +188,12 @@ public class BicingBoard {
       furgonetas[ifurg][DESTINO2] = -1;
       origenOcupado[furgonetas[ifurg][ORIGEN]] = false;
     }
+    else if (furgonetas[ifurg][DESTINO2] == iest) {
+      clean_bicis_dejadas(ifurg);
+      furgonetas[ifurg][DESTINO2] = -1;
+      furgonetas[ifurg][DESTINO1] = iest;
+      update_bicis_dejadas(ifurg);
+    }
     else {
       clean_bicis_dejadas(ifurg);
       furgonetas[ifurg][DESTINO1] = iest;
