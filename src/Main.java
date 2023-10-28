@@ -135,7 +135,7 @@ public class Main {
       
       Problem problem =  new Problem(board, new BicingSuccessorFunctionSA(), 
           new BicingGoalTest(), new BicingHeuristicFunction());
-      SimulatedAnnealingSearch search =  new SimulatedAnnealingSearch(10000,100,125,0.0001); //Parametros del SA
+      SimulatedAnnealingSearch search =  new SimulatedAnnealingSearch(50000,500,5,0.0001); //Parametros del SA
       //iteraciones totales, num it para cada cambio de temp, 
       SearchAgent agent = new SearchAgent(problem,search);
             
@@ -187,7 +187,7 @@ public class Main {
       
       Problem problem =  new Problem(board, new BicingSuccessorFunctionSA(), 
           new BicingGoalTest(), new BicingHeuristicFunction2());
-      SimulatedAnnealingSearch search =  new SimulatedAnnealingSearch(10000,100,125,0.001); //Parametros del SA
+      SimulatedAnnealingSearch search =  new SimulatedAnnealingSearch(100000,1000,125,0.001); //Parametros del SA
       SearchAgent agent = new SearchAgent(problem,search);
       //2000 100 5 0.001
             

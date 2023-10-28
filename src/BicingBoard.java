@@ -111,6 +111,7 @@ public class BicingBoard {
       int temp = furgonetas[randomIndexToSwap][ORIGEN];
       furgonetas[randomIndexToSwap][ORIGEN] = furgonetas[i][ORIGEN];
       furgonetas[i][ORIGEN] = temp;
+      origenOcupado[temp] = true;
     }
     for (int i = 0; i < furgonetas.length; i++) {
       destinoFullRandom(furgonetas[i], random);
@@ -121,13 +122,13 @@ public class BicingBoard {
   private void destinoFullRandom(int[] furgoneta, Random random) {
     if (estaciones.size() <= 1) return; // Caso base: 1 o menos estaciones, la mejor opcion es no hacer nada
     // -1: no va a ninguna estacion
-    //furgoneta[DESTINO1] = -random.nextInt(0, 2);
+    furgoneta[DESTINO1] = -random.nextInt(0, 2);
     furgoneta[DESTINO1] = 0;
     if (furgoneta[DESTINO1] != -1) {
       do furgoneta[DESTINO1] = random.nextInt(0, estaciones.size());
       while (furgoneta[DESTINO1] == furgoneta[ORIGEN] && estaciones.size() > 1);
 
-      //furgoneta[DESTINO2] = -random.nextInt(0, 2);
+      furgoneta[DESTINO2] = -random.nextInt(0, 2);
       furgoneta[DESTINO2] = 0;
       if (furgoneta[DESTINO2] != -1 && estaciones.size() > 2) {
         do furgoneta[DESTINO2] = random.nextInt(0, estaciones.size());
@@ -170,8 +171,8 @@ public class BicingBoard {
     for (int i = 0; i < furgonetas.length; ++i) {
       furgonetas[i][ORIGEN] = i;
       origenOcupado[i] = true;
-      furgonetas[i][DESTINO1] = estaciones.size() - 1 - i;
-      //destinoFullRandom(furgonetas[i], rand);
+      //furgonetas[i][DESTINO1] = estaciones.size() - 1 - i;
+      destinoFullRandom(furgonetas[i], rand);
       update_bicis_dejadas(i);
     }
   }
@@ -182,12 +183,9 @@ public class BicingBoard {
   public void cambiar_destino1(int ifurg, int iest) {
     if (furgonetas[ifurg][ORIGEN] == iest) {
       //La furgoneta passa a no hacer nada
-      if (furgonetas[ifurg][DESTINO1] != -1) bicis_dejadas[furgonetas[ifurg][DESTINO1]] -= furgonetas[ifurg][BICIS1];
-      if (furgonetas[ifurg][DESTINO2] != -1) bicis_dejadas[furgonetas[ifurg][DESTINO2]] -= furgonetas[ifurg][BICIS2];
+      clean_bicis_dejadas(ifurg);
       furgonetas[ifurg][DESTINO1] = -1;
       furgonetas[ifurg][DESTINO2] = -1;
-      furgonetas[ifurg][BICIS1] = 0;
-      furgonetas[ifurg][BICIS2] = 0;
       origenOcupado[furgonetas[ifurg][ORIGEN]] = false;
     }
     else {
@@ -223,8 +221,7 @@ public class BicingBoard {
   // No tiene sentido cambiar origen si no tiene destino o no tiene origen
 
   public boolean puede_cambiar_origen(int ifurg, int iest) {
-    return furgonetas[ifurg][DESTINO1] != -1 && furgonetas[ifurg][ORIGEN] != -1 && !origenOcupado[iest] 
-      && furgonetas[ifurg][DESTINO1] != iest && furgonetas[ifurg][DESTINO2] != iest;
+    return !origenOcupado[iest] && furgonetas[ifurg][DESTINO1] != iest && furgonetas[ifurg][DESTINO2] != iest;
   }
 
 
@@ -232,6 +229,7 @@ public class BicingBoard {
     origenOcupado[furgonetas[ifurg][ORIGEN]] = false;
     furgonetas[ifurg][ORIGEN] = iest;
     origenOcupado[iest] = true;
+    
     clean_bicis_dejadas(ifurg);
     update_bicis_dejadas(ifurg);
   }
