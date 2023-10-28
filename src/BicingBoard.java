@@ -331,20 +331,23 @@ public class BicingBoard {
   //pueda y se necesite en el D1, y lo que sobre en el D2
 
   public void update_bicis_dejadas(int ifurg) {
+      int bicis_origen = Math.max(0, getMaxBicis(furgonetas[ifurg][ORIGEN]));
+
       if (furgonetas[ifurg][DESTINO1] != -1) {
-        furgonetas[ifurg][BICIS1] = Math.max(0, getMaxBicis(furgonetas[ifurg][ORIGEN]));
+        int d1 = furgonetas[ifurg][DESTINO1];
+        int bicis_necesitadas = Math.max(0, estaciones.get(d1).getDemanda() - estaciones.get(d1).getNumBicicletasNext() - bicis_dejadas[d1]);
+        furgonetas[ifurg][BICIS1] = Math.min(bicis_origen, bicis_necesitadas);
+        bicis_origen -= furgonetas[ifurg][BICIS1];
         bicis_dejadas[furgonetas[ifurg][DESTINO1]] += furgonetas[ifurg][BICIS1];
       }
      
       //Recalculo las que se pueden dejar en D2 si es que existeD2
-
       if (furgonetas[ifurg][DESTINO2] != -1) {
-          int bicis_d1 = Math.min(furgonetas[ifurg][BICIS1], bicis_dejadas[furgonetas[ifurg][DESTINO1]] - getBicisNecesitadas(furgonetas[ifurg][DESTINO1]));
-          if (bicis_d1 < 0) bicis_d1 = 0;
-          furgonetas[ifurg][BICIS2] = bicis_d1;
-          furgonetas[ifurg][BICIS1] -= bicis_d1;
-          bicis_dejadas[furgonetas[ifurg][DESTINO2]] += bicis_d1; 
-          bicis_dejadas[furgonetas[ifurg][DESTINO1]] -= bicis_d1; 
+        int d2 = furgonetas[ifurg][DESTINO2];
+        int bicis_necesitadas = Math.max(0, estaciones.get(d2).getDemanda() - estaciones.get(d2).getNumBicicletasNext() - bicis_dejadas[d2]);
+        furgonetas[ifurg][BICIS2] = Math.min(bicis_origen, bicis_necesitadas);
+        bicis_origen -= furgonetas[ifurg][BICIS2];
+        bicis_dejadas[furgonetas[ifurg][DESTINO2]] += furgonetas[ifurg][BICIS2];
       }
   }
 
