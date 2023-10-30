@@ -14,7 +14,6 @@ public class BicingSuccessorFunction implements SuccessorFunction {
     
     //Cambiar el destino 1
 
-    
     for (int i = 0; i < board.getNumFurgos(); ++i) {
       for (int j = 0; j < board.getNumEstaciones(); ++j) {
         BicingBoard newBoard = new BicingBoard(board.getOrigenesOcupados(), board.getFurgonetas(), board.getBicisDejadas());
@@ -98,7 +97,6 @@ public class BicingSuccessorFunction implements SuccessorFunction {
       }
     }
     */
-
     
     return retVal;
   }

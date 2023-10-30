@@ -13,10 +13,12 @@ public class Main {
   private static int nbic = 1250;
   private static int nfurg = 5;
   private static int dem = Estaciones.EQUILIBRIUM;
-  private static int seed = 1234;
-  private static int solucion = 1;
-  private static int heuristica = 1;
-  private static boolean HillClimbing = true;
+  private static int seed = 333;
+  private static int solucion = 3;
+  private static int heuristica = 2;
+  private static boolean HillClimbing = false;
+  private static int k = 1;
+  private static double lambda = 0.0001;
    
   public static void main(String[] args){
     defVars(); 
@@ -25,7 +27,7 @@ public class Main {
 
   public static void defVars() {
     Scanner sc = new Scanner(System.in);
-    
+
     System.out.print("Indica el número de estaciones: ");
     nest = sc.nextInt();
 
@@ -51,9 +53,9 @@ public class Main {
       seed = rand.nextInt(0, 100000);
     }
 
-    System.out.print("Selecciona el estado inicial {1: Trivial, 2: Random, 3: Voraz1, 4: Voraz2}: ");
+    System.out.print("Selecciona la solución inicial {1: Trivial, 2: Random, 3: Voraz}: ");
     solucion = sc.nextInt();
-    if (solucion < 1 || solucion > 4) System.exit(-1);
+    if (solucion < 1 || solucion > 3) System.exit(-1);
 
     System.out.print("Selecciona la heurística {1: Max. beneficio por traslado, 2: 1 + transporte}: ");
     heuristica = sc.nextInt();
@@ -61,6 +63,13 @@ public class Main {
 
     System.out.print("Selecciona el algoritmo de búsqueda local {1: HillClimbing, 2: SA}: ");
     HillClimbing = sc.nextInt() == 1;
+
+    if (!HillClimbing) {
+      System.out.print("Indica el valor de k para el simulated annealing: ");
+      k = sc.nextInt();
+      System.out.print("Indica el valor de lambda para el simulated annealing: ");
+      lambda = sc.nextDouble();
+    }
   }
 
   public static void iniciar_experimento() {
@@ -75,19 +84,16 @@ public class Main {
         board.generar_solucion_random();
         break;
       case 3:
-        board.generar_solucion_voraz1();
-        break;
-      case 4:
-        board.generar_solucion_voraz2();
+        board.generar_solucion_voraz();
         break;
       default:
-        board.generar_solucion_voraz1();
+        board.generar_solucion_voraz();
         break;
     }
     //Si la sol. inicial es trivial el benefico será obviamente de 0, y mucho mejor en la greedy.
     System.out.println();
     System.out.println("Antes de la búsqueda el benefico es de : " + board.getBeneficio());
-    System.out.println("Antes de la búsqueda el benefico (sin transporte) es de : " + -board.getPrecio1());
+    System.out.println("Antes de la búsqueda el benefico (el transporte es gratis) es de : " + -board.getPrecio1());
     System.out.println("La seed es " + seed);
     System.out.println();
 
@@ -115,12 +121,11 @@ public class Main {
       time = System.currentTimeMillis() - time;
       BicingBoard newboard = (BicingBoard) search.getGoalState(); 
       System.out.println("Después de la búsqueda el benefico es de : " + newboard.getBeneficio());
-      System.out.println("Después de la búsqueda el benefico (sin transporte) es de : " + -newboard.getPrecio1());
+      System.out.println("Antes de la búsqueda el benefico (el transporte es gratis) es de : " + -newboard.getPrecio1());
       System.out.println("El coste del transporte es de " + newboard.getCosteTransporte());
       System.out.println("La distancia recorrida es de " + newboard.getDistancia());
       System.out.println("Tiempo transcurrido: " + time + " ms");
 
-      printActions(agent.getActions());
       printInstrumentation(agent.getInstrumentation());
     } 
     catch (Exception e) {
@@ -135,18 +140,17 @@ public class Main {
       
       Problem problem =  new Problem(board, new BicingSuccessorFunctionSA(), 
           new BicingGoalTest(), new BicingHeuristicFunction());
-      SimulatedAnnealingSearch search =  new SimulatedAnnealingSearch(50000,500,5,0.0001); //Parametros del SA
-      //iteraciones totales, num it para cada cambio de temp, 
+      SimulatedAnnealingSearch search =  new SimulatedAnnealingSearch(5000,100,k,lambda); //Parametros del SA
       SearchAgent agent = new SearchAgent(problem,search);
             
       time = System.currentTimeMillis() - time;
       BicingBoard newboard = (BicingBoard) search.getGoalState(); 
       System.out.println("Después de la búsqueda el benefico es de : " + newboard.getBeneficio());
-      System.out.println("Después de la búsqueda el benefico (sin transporte) es de : " + -newboard.getPrecio1());
+      System.out.println("Después de la búsqueda el benefico (el transporte es gratis) es de : " + -newboard.getPrecio1());
       System.out.println("El coste del transporte es de " + newboard.getCosteTransporte());
       System.out.println("La distancia recorrida es de " + newboard.getDistancia());
       System.out.println("Tiempo transcurrido: " + time + " ms");
-      //printActions(agent.getActions());
+      
       printInstrumentation(agent.getInstrumentation());
     } 
     catch (Exception e) {
@@ -167,12 +171,11 @@ public class Main {
       time = System.currentTimeMillis() - time;
       BicingBoard newboard = (BicingBoard) search.getGoalState(); 
       System.out.println("Después de la búsqueda el benefico es de : " + newboard.getBeneficio());
-      System.out.println("Después de la búsqueda el benefico (sin transporte) es de : " + -newboard.getPrecio1());
+      System.out.println("Después de la búsqueda el benefico (el transporte es gratis) es de : " + -newboard.getPrecio1());
       System.out.println("El coste del transporte es de " + newboard.getCosteTransporte());
       System.out.println("La distancia recorrida es de " + newboard.getDistancia());
       System.out.println("Tiempo transcurrido: " + time + " ms");
       
-      printActions(agent.getActions());
       printInstrumentation(agent.getInstrumentation());
     } 
     catch (Exception e) {
@@ -187,18 +190,19 @@ public class Main {
       
       Problem problem =  new Problem(board, new BicingSuccessorFunctionSA(), 
           new BicingGoalTest(), new BicingHeuristicFunction2());
-      SimulatedAnnealingSearch search =  new SimulatedAnnealingSearch(100000,1000,125,0.001); //Parametros del SA
+      SimulatedAnnealingSearch search =  new SimulatedAnnealingSearch(5000,100,k,lambda); //Parametros del SA
       SearchAgent agent = new SearchAgent(problem,search);
-      //2000 100 5 0.001
             
       time = System.currentTimeMillis() - time;
+      
+      
       BicingBoard newboard = (BicingBoard) search.getGoalState(); 
       System.out.println("Después de la búsqueda el benefico es de : " + newboard.getBeneficio());
-      System.out.println("Después de la búsqueda el benefico (sin transporte) es de : " + -newboard.getPrecio1());
+      System.out.println("Después de la búsqueda el benefico (el transporte es gratis) es de : " + -newboard.getPrecio1());
       System.out.println("El coste del transporte es de " + newboard.getCosteTransporte());
       System.out.println("La distancia recorrida es de " + newboard.getDistancia());
       System.out.println("Tiempo transcurrido: " + time + " ms");
-      //printActions(agent.getActions());
+      
       printInstrumentation(agent.getInstrumentation());
     } 
     catch (Exception e) {

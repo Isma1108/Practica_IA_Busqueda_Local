@@ -6,5 +6,4 @@ public class BicingHeuristicFunction implements HeuristicFunction {
     BicingBoard board = (BicingBoard) state;
     return board.getPrecio1();
   }
-
 }
